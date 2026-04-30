@@ -1,0 +1,11 @@
+Options -Indexes
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
+
+<IfModule mod_php.c>
+  php_value session.cookie_httponly 1
+  php_value session.cookie_samesite Lax
+  php_value session.use_strict_mode 1
+</IfModule>
