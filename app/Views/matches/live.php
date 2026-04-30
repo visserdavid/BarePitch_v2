@@ -71,19 +71,20 @@ $eventTypes = [
   <h2 class="t-h3" style="margin:0 0 var(--s-3);">Period controls</h2>
   <div class="bp-cluster">
     <?php if ($period === null): ?>
-      <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/period/start">
+      <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/start">
         <?php include __DIR__ . '/../partials/csrf.php'; ?>
         <button type="submit" class="btn btn-primary">Start first half</button>
       </form>
     <?php else: ?>
       <?php $periodEnded = !empty($period['ended_at']); ?>
       <?php if (!$periodEnded): ?>
-        <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/period/end">
+        <?php $periodId = (int)($period['id'] ?? 0); ?>
+        <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/periods/<?= htmlspecialchars((string)$periodId, ENT_QUOTES, 'UTF-8') ?>/end">
           <?php include __DIR__ . '/../partials/csrf.php'; ?>
           <button type="submit" class="btn btn-secondary">End period</button>
         </form>
       <?php else: ?>
-        <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/period/start">
+        <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/periods/start-second-half">
           <?php include __DIR__ . '/../partials/csrf.php'; ?>
           <button type="submit" class="btn btn-primary">Start next half</button>
         </form>
@@ -114,7 +115,7 @@ $eventTypes = [
   <?php foreach ($eventTypes as $typeKey => $typeData): ?>
     <div id="form-<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>" class="event-form bp-card" hidden>
       <h3 class="t-h3" style="margin:0 0 var(--s-4);"><?= htmlspecialchars($typeData['label'], ENT_QUOTES, 'UTF-8') ?></h3>
-      <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/events" class="bp-stack">
+      <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/events/<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>" class="bp-stack">
         <?php include __DIR__ . '/../partials/csrf.php'; ?>
         <input type="hidden" name="event_type" value="<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>">
 
