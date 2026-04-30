@@ -250,7 +250,8 @@ CREATE TABLE IF NOT EXISTS match_selection (
   PRIMARY KEY (id),
   UNIQUE KEY uq_ms_match_player (match_id, player_id),
   CONSTRAINT fk_ms_match  FOREIGN KEY (match_id)  REFERENCES `match`(id),
-  CONSTRAINT fk_ms_player FOREIGN KEY (player_id) REFERENCES player(id)
+  CONSTRAINT fk_ms_player FOREIGN KEY (player_id) REFERENCES player(id),
+  CONSTRAINT fk_ms_psc    FOREIGN KEY (player_season_context_id) REFERENCES player_season_context(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- -------------------------------------------------------
@@ -268,6 +269,7 @@ CREATE TABLE IF NOT EXISTS match_lineup_slot (
   updated_at           DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY uq_mls_match_selection (match_id, match_selection_id),
+  UNIQUE KEY uq_mls_match_grid (match_id, grid_row, grid_col),
   CONSTRAINT fk_mls_match     FOREIGN KEY (match_id)             REFERENCES `match`(id),
   CONSTRAINT fk_mls_selection FOREIGN KEY (match_selection_id)   REFERENCES match_selection(id),
   CONSTRAINT fk_mls_fp        FOREIGN KEY (formation_position_id) REFERENCES formation_position(id)

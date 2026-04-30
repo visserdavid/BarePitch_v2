@@ -9,7 +9,16 @@ if (file_exists($envPath)) {
             continue;
         }
         [$key, $value] = explode('=', $line, 2);
-        putenv(trim($key) . '=' . trim($value));
+        $value = trim($value);
+        if (strlen($value) >= 2) {
+            $firstChar = $value[0];
+            $lastChar  = $value[-1];
+            if (($firstChar === '"' && $lastChar === '"') ||
+                ($firstChar === "'" && $lastChar === "'")) {
+                $value = substr($value, 1, -1);
+            }
+        }
+        putenv(trim($key) . '=' . $value);
     }
 }
 
