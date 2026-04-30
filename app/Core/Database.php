@@ -10,6 +10,10 @@ class Database
 
     public static function connect(): \PDO
     {
+        if (self::$connection !== null) {
+            return self::$connection;
+        }
+
         $host   = getenv('DB_HOST')     ?: 'localhost';
         $name   = getenv('DB_NAME')     ?: '';
         $user   = getenv('DB_USER')     ?: '';

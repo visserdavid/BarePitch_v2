@@ -33,12 +33,20 @@ class Env
             $key   = trim($key);
             $value = trim($value);
 
-            // Strip optional surrounding quotes (single or double)
-            if (
+            $quoted = (
                 (str_starts_with($value, '"') && str_ends_with($value, '"')) ||
                 (str_starts_with($value, "'") && str_ends_with($value, "'"))
-            ) {
+            );
+
+            // Strip optional surrounding quotes (single or double)
+            if ($quoted) {
                 $value = substr($value, 1, -1);
+            } else {
+                // Strip inline comments: anything from the first ' #' onward
+                $commentPos = strpos($value, ' #');
+                if ($commentPos !== false) {
+                    $value = trim(substr($value, 0, $commentPos));
+                }
             }
 
             putenv("{$key}={$value}");

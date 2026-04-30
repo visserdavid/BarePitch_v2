@@ -40,7 +40,7 @@ class Session
         setcookie(
             session_name(),
             '',
-            time() - 42000,
+            time() - 3600,
             $params['path'],
             $params['domain'],
             $params['secure'],
@@ -64,5 +64,17 @@ class Session
         }
 
         return hash_equals($_SESSION['_csrf'], $token);
+    }
+
+    public static function flash(string $key, string $message): void
+    {
+        $_SESSION['_flash'][$key] = $message;
+    }
+
+    public static function getFlash(string $key): ?string
+    {
+        $value = $_SESSION['_flash'][$key] ?? null;
+        unset($_SESSION['_flash'][$key]);
+        return $value;
     }
 }

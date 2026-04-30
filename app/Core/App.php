@@ -20,11 +20,17 @@ class App
 
         $idleMinutes = (int) (getenv('SESSION_IDLE_MINUTES') ?: 30);
 
-        session_start([
-            'cookie_httponly' => true,
-            'cookie_samesite' => 'Lax',
-            'gc_maxlifetime'  => $idleMinutes * 60,
-        ]);
+        // SESSION_ABSOLUTE_HOURS is defined in .env but enforcement is deferred
+        // to the auth service layer (Stage 7).
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start([
+                'cookie_httponly' => true,
+                'cookie_samesite' => 'Lax',
+                'cookie_secure'   => getenv('FORCE_HTTPS') === 'true',
+                'gc_maxlifetime'  => $idleMinutes * 60,
+            ]);
+        }
 
         Database::connect();
     }
