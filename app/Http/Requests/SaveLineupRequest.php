@@ -61,7 +61,7 @@ class SaveLineupRequest
 
             if (!isset($errors["slots.{$index}.selection_id"])) {
                 $slots[] = [
-                    'selection_id'           => (int) $selectionId,
+                    'match_selection_id'     => (int) $selectionId,
                     'formation_position_id'  => $posId,
                 ];
             }

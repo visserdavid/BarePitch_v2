@@ -58,6 +58,20 @@ class RegisterGoalRequest
             }
         }
 
+        // assist_selection_id: optional positive int, must not equal player_selection_id
+        $assistSelectionIdRaw = $request->input('assist_selection_id');
+        $assistSelectionId    = null;
+        if ($assistSelectionIdRaw !== null && $assistSelectionIdRaw !== '') {
+            $assistSelectionId = (int) $assistSelectionIdRaw;
+            if ($assistSelectionId < 1) {
+                $errors['assist_selection_id'] = 'assist_selection_id must be a positive integer.';
+                $assistSelectionId = null;
+            } elseif ($playerSelectionId !== null && $assistSelectionId === $playerSelectionId) {
+                $errors['assist_selection_id'] = 'assist_selection_id must not equal player_selection_id.';
+                $assistSelectionId = null;
+            }
+        }
+
         // minute_display: required, 0–120
         $minuteRaw    = $request->input('minute_display');
         $minuteDisplay = null;
@@ -78,6 +92,7 @@ class RegisterGoalRequest
         return [
             'team_side'            => $teamSide,
             'player_selection_id'  => $playerSelectionId,
+            'assist_selection_id'  => $assistSelectionId,
             'zone_code'            => $zoneCode,
             'minute_display'       => (int) $minuteDisplay,
         ];

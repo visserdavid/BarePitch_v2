@@ -53,6 +53,10 @@ class SaveAttendanceRequest
             throw new ValidationException($errors);
         }
 
-        return ['attendance' => $normalized];
+        return ['attendance' => array_values(array_map(
+            fn($pid, $status) => ['player_id' => $pid, 'status' => $status],
+            array_keys($normalized),
+            array_values($normalized)
+        ))];
     }
 }
