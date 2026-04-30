@@ -34,3 +34,6 @@ desktop.ini
 /coverage/
 /.phpunit.cache/
 
+# Git worktrees
+/.worktrees/
+
