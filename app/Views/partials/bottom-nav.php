@@ -29,7 +29,7 @@ $isActive = static function (string $href, string $path): bool {
 <?php foreach ($items as $item): ?>
   <?php $active = $isActive($item['href'], $currentPath); ?>
   <a href="<?= htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8') ?>"
-     <?= $active ? 'aria-current="page"' : '' ?>>
+     <?php if ($active): ?> aria-current="page"<?php endif; ?>>
     <svg class="bp-icon" aria-hidden="true">
       <use href="/assets/barepitch-icons.svg#bp-icon-<?= htmlspecialchars($item['icon'], ENT_QUOTES, 'UTF-8') ?>"></use>
     </svg>

@@ -230,9 +230,9 @@ $eventTypes = [
             'yellow_card' => 'Yellow card',
             'red_card'    => 'Red card',
             'note'        => 'Note',
-            default       => htmlspecialchars($evType, ENT_QUOTES, 'UTF-8'),
+            default       => $evType,
         };
-        $sideLabel = ($evSide === 'own') ? htmlspecialchars($teamName, ENT_QUOTES, 'UTF-8') : htmlspecialchars($opponent, ENT_QUOTES, 'UTF-8');
+        $sideLabel = ($evSide === 'own') ? $teamName : $opponent;
         ?>
         <div class="tl-row">
           <span class="tl-min"><?= $evMin !== null ? htmlspecialchars((string)$evMin . "'", ENT_QUOTES, 'UTF-8') : '–' ?></span>
@@ -247,11 +247,11 @@ $eventTypes = [
           </span>
           <span class="tl-event">
             <span class="who">
-              <?= $evPlayer !== '' ? htmlspecialchars($evPlayer, ENT_QUOTES, 'UTF-8') : $sideLabel ?>
+              <?= $evPlayer !== '' ? htmlspecialchars($evPlayer, ENT_QUOTES, 'UTF-8') : htmlspecialchars($sideLabel, ENT_QUOTES, 'UTF-8') ?>
             </span>
             <span class="what">
               <?= htmlspecialchars($evLabel, ENT_QUOTES, 'UTF-8') ?>
-              <?= $evSide !== '' ? '· ' . $sideLabel : '' ?>
+              <?= $evSide !== '' ? '· ' . htmlspecialchars($sideLabel, ENT_QUOTES, 'UTF-8') : '' ?>
               <?= $evNote !== '' ? '· ' . htmlspecialchars($evNote, ENT_QUOTES, 'UTF-8') : '' ?>
             </span>
           </span>

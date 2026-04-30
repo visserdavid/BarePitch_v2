@@ -36,6 +36,7 @@ $currentPath = isset($currentPath) && is_string($currentPath) ? $currentPath : '
 
   <main class="bp-app-shell">
     <?php include __DIR__ . '/../partials/flash.php'; ?>
+    <?php // $content is pre-rendered HTML from View::render() — do not escape. ?>
     <?= $content ?>
   </main>
 
