@@ -52,8 +52,6 @@ use BarePitch\Http\Controllers\PlayerController;
 Env::load(BASE_PATH . '/.env');
 App::boot();
 
-$request = new Request();
-
 // ── Wire up repositories ───────────────────────────────────────────────────
 $pdo = Database::connection();
 

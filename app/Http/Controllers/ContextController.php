@@ -38,6 +38,10 @@ class ContextController
         }
 
         $redirect = (string) $request->post('redirect', '/');
+        // Only allow local paths (must start with '/' and not contain '://')
+        if (!str_starts_with($redirect, '/') || str_contains($redirect, '://')) {
+            $redirect = '/';
+        }
         Response::redirect($redirect ?: '/');
     }
 }

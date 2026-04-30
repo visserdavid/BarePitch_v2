@@ -15,6 +15,22 @@ class PlayerRepository
         return $stmt->fetch() ?: null;
     }
 
+    /**
+     * Fetch a player only if they belong to the given team and season.
+     * Returns null if the player does not exist or is not in that team/season scope.
+     */
+    public function findByIdForTeam(int $playerId, int $teamId, int $seasonId): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT p.*, psc.shirt_number, psc.position_line, psc.is_active AS context_is_active
+             FROM player p
+             JOIN player_season_context psc ON psc.player_id = p.id
+             WHERE p.id = ? AND psc.team_id = ? AND psc.season_id = ?'
+        );
+        $stmt->execute([$playerId, $teamId, $seasonId]);
+        return $stmt->fetch() ?: null;
+    }
+
     /** Returns players with their season context for a given team+season */
     public function findActiveByTeamAndSeason(int $teamId, int $seasonId): array
     {

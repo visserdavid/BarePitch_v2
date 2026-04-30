@@ -10,6 +10,7 @@ use BarePitch\Core\Response;
 use BarePitch\Core\View;
 use BarePitch\Core\Exceptions\NotFoundException;
 use BarePitch\Core\Exceptions\ValidationException;
+use BarePitch\Http\Requests\CreatePlayerRequest;
 use BarePitch\Policies\PlayerPolicy;
 use BarePitch\Repositories\PlayerRepository;
 use BarePitch\Services\AuthService;
@@ -69,46 +70,25 @@ class PlayerController
 
         Csrf::verify($request);
 
-        $firstName   = trim((string) $request->post('first_name', ''));
-        $lastName    = trim((string) $request->post('last_name', ''));
-        $displayName = trim((string) $request->post('display_name', ''));
-
-        $errors = [];
-        if ($firstName === '') {
-            $errors['first_name'] = 'First name is required.';
-        } elseif (mb_strlen($firstName) > 100) {
-            $errors['first_name'] = 'First name must not exceed 100 characters.';
-        }
-        if ($lastName === '') {
-            $errors['last_name'] = 'Last name is required.';
-        } elseif (mb_strlen($lastName) > 100) {
-            $errors['last_name'] = 'Last name must not exceed 100 characters.';
-        }
-        if ($displayName !== '' && mb_strlen($displayName) > 100) {
-            $errors['display_name'] = 'Display name must not exceed 100 characters.';
-        }
-
-        if ($errors !== []) {
+        try {
+            $data = CreatePlayerRequest::validate($request);
+        } catch (ValidationException $e) {
             echo View::layout('players/create', [
                 'team'   => $team,
-                'errors' => $errors,
+                'errors' => $e->getErrors(),
                 'old'    => $request->all(),
                 'user'   => $user,
             ]);
             return;
         }
 
-        $squadNumber   = $request->post('squad_number');
-        $preferredLine = trim((string) $request->post('preferred_line', ''));
-        $preferredFoot = trim((string) $request->post('preferred_foot', ''));
-
         $playerId = $this->playerService->create($user, $team, [
-            'first_name'    => $firstName,
-            'last_name'     => $lastName,
-            'display_name'  => $displayName !== '' ? $displayName : null,
-            'squad_number'  => ($squadNumber !== null && $squadNumber !== '') ? (int) $squadNumber : null,
-            'preferred_line' => $preferredLine !== '' ? $preferredLine : null,
-            'preferred_foot' => $preferredFoot !== '' ? $preferredFoot : null,
+            'first_name'     => $data['first_name'],
+            'last_name'      => $data['last_name'],
+            'display_name'   => $data['display_name'],
+            'squad_number'   => $data['shirt_number'],
+            'preferred_line' => $data['position_line'],
+            'preferred_foot' => null,
         ]);
 
         Response::redirect('/players/' . $playerId);
@@ -116,20 +96,27 @@ class PlayerController
 
     public function show(Request $request, array $params = []): void
     {
-        $user   = $this->auth->requireAuth();
-        $team   = $this->teamContext->requireTeamContext($user);
-        $player = $this->players->findById((int) ($params['player_id'] ?? 0));
+        $user = $this->auth->requireAuth();
+        $team = $this->teamContext->requireTeamContext($user);
+
+        PlayerPolicy::canView($user, $team);
+
+        $seasonId = (int) ($team['current_season_id'] ?? 0);
+        if ($seasonId === 0) {
+            throw new NotFoundException('Player not found.');
+        }
+
+        $player = $this->players->findByIdForTeam(
+            (int) ($params['player_id'] ?? 0),
+            (int) $team['id'],
+            $seasonId
+        );
 
         if (!$player) {
             throw new NotFoundException('Player not found.');
         }
 
-        PlayerPolicy::canView($user, $team);
-
-        $seasonId      = (int) ($team['current_season_id'] ?? 0);
-        $seasonContext = $seasonId > 0
-            ? $this->players->findSeasonContext((int) $player['id'], $seasonId)
-            : null;
+        $seasonContext = $this->players->findSeasonContext((int) $player['id'], $seasonId);
 
         echo View::layout('players/show', [
             'player'        => $player,

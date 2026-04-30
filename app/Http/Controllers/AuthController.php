@@ -71,6 +71,6 @@ class AuthController
     {
         Csrf::verify($request);
         $this->auth->logout();
-        Response::redirect('/auth/dev-login');
+        Response::redirect('/');
     }
 }
