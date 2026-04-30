@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">BarePitch mark</title>
+  <desc id="desc">A BarePitch monogram with a pitch-green line.</desc>
+  <rect width="64" height="64" rx="14" fill="#232522"/>
+  <path d="M22 15h13.6c6.8 0 11 3.6 11 9.4 0 3.7-1.8 6.4-5 7.9 4.1 1.3 6.4 4.5 6.4 8.8 0 6.2-4.7 10-12.1 10H22V15Zm13 14.1c3 0 4.8-1.5 4.8-4.1 0-2.5-1.8-4-4.8-4h-5.8v8.1H35Zm.8 15.9c3.5 0 5.4-1.7 5.4-4.6 0-2.8-2-4.5-5.4-4.5h-6.6V45h6.6Z" fill="#FBFAF4"/>
+  <rect x="12" y="52" width="40" height="4" rx="2" fill="#79D98D"/>
+</svg>

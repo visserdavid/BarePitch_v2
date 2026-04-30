@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BarePitch — Brand & UI Kit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body data-theme="light">
+<div id="app"></div>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="icons.jsx"></script>
+<script type="text/babel" src="screens-1.jsx"></script>
+<script type="text/babel" src="screens-2.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "light"
+}/*EDITMODE-END*/;
+
+const Logo = ({ size = 18, monoSize = 32 }) => (
+  <span className="bp-logo">
+    <span className="bp-mono" style={{ width: monoSize, height: monoSize, fontSize: monoSize / 2, borderRadius: monoSize / 4.5 }}>B</span>
+    <span className="bp-wordmark" style={{ fontSize: size }}>BarePitch <em>v1</em></span>
+  </span>
+);
+
+const SectionHead = ({ num, title, lede }) => (
+  <header className="section-head">
+    <span className="num">{num}</span>
+    <h2>{title}</h2>
+    {lede && <span className="lede">{lede}</span>}
+  </header>
+);
+
+const App = () => {
+  const [tweaks, setTweaks] = useTweaks(TWEAK_DEFAULTS);
+  const setTweak = (k, v) => {
+    if (typeof k === "object") setTweaks(k);
+    else setTweaks({ [k]: v });
+  };
+
+  useEffect(() => {
+    document.body.setAttribute("data-theme", tweaks.theme);
+  }, [tweaks.theme]);
+
+  return (
+    <>
+      {/* Top nav */}
+      <div className="top-nav">
+        <div className="top-nav-inner">
+          <Logo />
+          <nav>
+            <a href="#identity">Identity</a>
+            <a href="#color">Color</a>
+            <a href="#type">Type</a>
+            <a href="#icons">Icons</a>
+            <a href="#components">Components</a>
+            <a href="#screens">Screens</a>
+          </nav>
+          <div className="theme-toggle" role="tablist" aria-label="Theme">
+            <button className={tweaks.theme === "light" ? "active" : ""} onClick={() => setTweak("theme", "light")}>Light</button>
+            <button className={tweaks.theme === "dark" ? "active" : ""} onClick={() => setTweak("theme", "dark")}>Dark</button>
+          </div>
+        </div>
+      </div>
+
+      <main className="page">
+        {/* Hero */}
+        <section className="hero">
+          <div className="col-left">
+            <span className="t-tiny">Brand & UI Kit · v1.0 · April 2026</span>
+            <h1>Shows what matters,<br/><em>when it matters.</em><br/>Nothing more.</h1>
+            <p className="lede">A calm, daylight-ready visual system for a coach managing a live football match on a smartphone — sideline, one hand, full attention on the pitch.</p>
+            <div className="meta">
+              <span className="chip">Mobile-first</span>
+              <span className="chip">PHP · MySQL · Plain CSS</span>
+              <span className="chip chip-accent">WCAG AA</span>
+            </div>
+          </div>
+          <div className="col-left" style={{ alignItems: "flex-end", gap: 14 }}>
+            <Logo size={28} monoSize={56} />
+            <div className="kv" style={{ alignItems: "flex-end", textAlign: "right" }}>
+              <span className="k">Tagline</span>
+              <span className="v">A coach's match companion.</span>
+            </div>
+          </div>
+        </section>
+
+        <div className="kit-meta">
+          <div><div className="k">Accent</div><div className="v" style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ display: "inline-block", width: 14, height: 14, borderRadius: 4, background: "var(--accent)" }}></span> Pitch green</div></div>
+          <div><div className="k">Type</div><div className="v">IBM Plex Sans + Mono</div></div>
+          <div><div className="k">Modes</div><div className="v">Light · Dark</div></div>
+          <div><div className="k">Min touch</div><div className="v">44 × 44 px</div></div>
+        </div>
+
+        {/* Identity */}
+        <section className="section" id="identity">
+          <SectionHead num="01" title="Identity" lede="Wordmark + monogram. The bar under the 'B' is a pitch line — quiet on its own, becomes accent in context." />
+
+          <div className="logo-lockups">
+            <div className="logo-frame">
+              <Logo size={22} monoSize={40} />
+              <span className="tag">Primary · light</span>
+            </div>
+            <div className="logo-frame dark">
+              <Logo size={22} monoSize={40} />
+              <span className="tag">Inverse · dark</span>
+            </div>
+            <div className="logo-frame accent">
+              <Logo size={22} monoSize={40} />
+              <span className="tag">Accent surface</span>
+            </div>
+          </div>
+
+          <div className="grid grid-3" style={{ marginTop: 32 }}>
+            <div className="panel" style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "flex-start" }}>
+              <span className="t-tiny">Monogram</span>
+              <span className="bp-mono" style={{ width: 80, height: 80, fontSize: 38, borderRadius: 18 }}>B</span>
+              <p className="t-small" style={{ margin: 0 }}>The B and the pitch-line. Used wherever the wordmark won't fit — favicons, status pills, public livestream header.</p>
+            </div>
+
+            <div className="panel" style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "flex-start" }}>
+              <span className="t-tiny">App icon</span>
+              <div style={{ display: "flex", gap: 14 }}>
+                <div className="appicon">B</div>
+                <div className="appicon green">B</div>
+                <div className="appicon light">B</div>
+              </div>
+              <p className="t-small" style={{ margin: 0 }}>22% radius. Pitch-line stays at the bottom in all variants — a quiet signature.</p>
+            </div>
+
+            <div className="panel" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <span className="t-tiny">Wordmark anatomy</span>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--ink-3)" }}>
+                <div>FONT — IBM Plex Sans 600</div>
+                <div>TRACKING — −0.025em</div>
+                <div>BARE / PITCH — single word, no space</div>
+                <div>VERSION TAG — Plex Sans 500, ink-3</div>
+              </div>
+              <div style={{ borderTop: "1px solid var(--line)", paddingTop: 14 }}>
+                <span className="bp-wordmark" style={{ fontSize: 30 }}>BarePitch</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Color */}
+        <section className="section" id="color">
+          <SectionHead num="02" title="Color" lede="Warm off-white surfaces and near-black ink. One green accent for action. Status colors only when meaning depends on them." />
+
+          <div style={{ marginBottom: 16 }} className="t-tiny">Surfaces & ink</div>
+          <div className="grid grid-4">
+            {[
+              { name: "Bg", val: "--bg" },
+              { name: "Bg 2", val: "--bg-2" },
+              { name: "Bg 3", val: "--bg-3" },
+              { name: "Line", val: "--line" },
+              { name: "Ink", val: "--ink" },
+              { name: "Ink 2", val: "--ink-2" },
+              { name: "Ink 3", val: "--ink-3" },
+              { name: "Ink inv", val: "--ink-inv" },
+            ].map(s => (
+              <div key={s.val} className="swatch">
+                <div className="swatch-color" style={{ background: `var(${s.val})`, borderBottom: "1px solid var(--line)" }}></div>
+                <div className="swatch-meta"><span className="name">{s.name}</span><span className="val">{s.val}</span></div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: 32, marginBottom: 16 }} className="t-tiny">Accent · status</div>
+          <div className="grid grid-4">
+            {[
+              { name: "Accent", val: "--accent", note: "Primary action" },
+              { name: "Accent soft", val: "--accent-soft", note: "Subtle bg" },
+              { name: "Warn", val: "--warn", note: "Yellow card" },
+              { name: "Danger", val: "--danger", note: "Red card · destruct" },
+            ].map(s => (
+              <div key={s.val} className="swatch">
+                <div className="swatch-color" style={{ background: `var(${s.val})` }}></div>
+                <div className="swatch-meta"><span className="name">{s.name}</span><span className="val">{s.val}</span></div>
+                <div style={{ padding: "0 14px 12px", fontSize: 11, color: "var(--ink-3)", fontFamily: "var(--font-mono)" }}>{s.note}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="divider"></div>
+          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }} className="t-small muted">
+            <span className="t-tiny" style={{ color: "var(--ink)" }}>Rules</span>
+            Colors are functional. Accent only on the highest-priority action per screen.
+            Status colors carry meaning — never decorative.
+            Never rely on color alone (cards always carry icon + label).
+          </div>
+        </section>
+
+        {/* Type */}
+        <section className="section" id="type">
+          <SectionHead num="03" title="Type" lede="IBM Plex Sans for everything human. IBM Plex Mono for time, score, IDs — anywhere tabular numerals matter." />
+
+          <div className="panel">
+            <div className="type-row">
+              <div className="meta">DISPLAY · 600 · −0.035em</div>
+              <div className="t-display">2 – 1</div>
+            </div>
+            <div className="type-row">
+              <div className="meta">H1 · 600 · 36px</div>
+              <div className="t-h1">Match preparation</div>
+            </div>
+            <div className="type-row">
+              <div className="meta">H2 · 600 · 26px</div>
+              <div className="t-h2">vs SV Bergen — Sat 14:30</div>
+            </div>
+            <div className="type-row">
+              <div className="meta">H3 · 600 · 19px</div>
+              <div className="t-h3">2nd half</div>
+            </div>
+            <div className="type-row">
+              <div className="meta">BODY · 400 · 15px</div>
+              <div className="t-body">A coach should manage a complete match flow from preparation to completion without manual database edits or developer intervention.</div>
+            </div>
+            <div className="type-row">
+              <div className="meta">SMALL · 400 · 13px</div>
+              <div className="t-small">11 starters placed · all present · no starter injured</div>
+            </div>
+            <div className="type-row">
+              <div className="meta">LABEL · 600 · 11px · UPPER</div>
+              <div className="t-tiny">2nd half · 68′</div>
+            </div>
+            <div className="type-row">
+              <div className="meta">MONO · TABULAR</div>
+              <div className="t-num" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.02em" }}>00:68 · 9 / 11 / 17</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Icons */}
+        <section className="section" id="icons">
+          <SectionHead num="04" title="Icons" lede="Outline · 24 px · 1.7 stroke. Icon-only is allowed for high-frequency match controls. Critical state transitions always carry text." />
+
+          <div className="icon-grid">
+            {[
+              "ball","swap","card","injury","note","trash","edit","clock",
+              "play","pause","whistle","team","player","matches","stats","settings",
+              "home","guest","back","more","plus","check","x","lock",
+              "mail","broadcast","field","cone","right","moon","sun",
+            ].map(n => (
+              <div key={n} className="icon-tile">
+                <Icon name={n} className="ico" />
+                <span className="label">{n}</span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div className="panel">
+              <span className="t-tiny">Icon-only · OK</span>
+              <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+                <button className="btn btn-secondary btn-icon" aria-label="Edit"><Icon name="edit" /></button>
+                <button className="btn btn-secondary btn-icon" aria-label="Delete"><Icon name="trash" /></button>
+                <button className="btn btn-secondary btn-icon" aria-label="Note"><Icon name="note" /></button>
+                <button className="btn btn-secondary btn-icon" aria-label="Sub"><Icon name="swap" /></button>
+                <button className="btn btn-secondary btn-icon" aria-label="Yellow"><Icon name="card" /></button>
+              </div>
+              <p className="t-small" style={{ margin: "12px 0 0" }}>Repeated, low-risk live actions.</p>
+            </div>
+            <div className="panel">
+              <span className="t-tiny" style={{ color: "var(--danger)" }}>Never icon-only</span>
+              <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+                <button className="btn btn-ink btn-sm"><Icon name="play" className="ico-sm" /> Start match</button>
+                <button className="btn btn-ink btn-sm"><Icon name="whistle" className="ico-sm" /> End period</button>
+                <button className="btn btn-danger btn-sm"><Icon name="trash" className="ico-sm" /> Delete</button>
+                <button className="btn btn-secondary btn-sm"><Icon name="lock" className="ico-sm" /> Logout</button>
+              </div>
+              <p className="t-small" style={{ margin: "12px 0 0" }}>Critical transitions, destructive, infrequent.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Components */}
+        <section className="section" id="components">
+          <SectionHead num="05" title="Components" lede="Buttons, fields, chips, cards. Touch targets ≥ 44 px. Spacing ≥ 8 px. Calm focus rings tinted by accent." />
+
+          {/* Buttons */}
+          <div className="panel" style={{ marginBottom: 16 }}>
+            <span className="t-tiny" style={{ marginBottom: 14, display: "block" }}>Buttons</span>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+              <button className="btn btn-primary"><Icon name="play" className="ico-sm" /> Start match</button>
+              <button className="btn btn-ink"><Icon name="whistle" className="ico-sm" /> End 2nd half</button>
+              <button className="btn btn-secondary">Cancel</button>
+              <button className="btn btn-ghost">Skip</button>
+              <button className="btn btn-danger"><Icon name="trash" className="ico-sm" /> Delete event</button>
+              <button className="btn btn-primary" disabled>Disabled</button>
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", marginTop: 14 }}>
+              <button className="btn btn-primary btn-lg btn-block" style={{ maxWidth: 320 }}>
+                <Icon name="check" /> Mark prepared
+              </button>
+              <button className="btn btn-secondary btn-sm">+ Add player</button>
+              <button className="btn btn-ghost btn-icon" aria-label="More"><Icon name="more" /></button>
+            </div>
+          </div>
+
+          <div className="grid grid-2">
+            {/* Form */}
+            <div className="panel">
+              <span className="t-tiny" style={{ marginBottom: 14, display: "block" }}>Form</span>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div className="field">
+                  <label>Opponent</label>
+                  <input className="input" placeholder="e.g. SV Bergen" defaultValue="SV Bergen" maxLength={120} />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div className="field">
+                    <label>Date</label>
+                    <input className="input t-mono" defaultValue="2026-05-11" />
+                  </div>
+                  <div className="field">
+                    <label>Kick-off</label>
+                    <input className="input t-mono" defaultValue="14:30" />
+                  </div>
+                </div>
+                <div className="field">
+                  <label>Notes (optional)</label>
+                  <textarea className="input" placeholder="Internal note for staff" defaultValue="Field B · home jerseys"></textarea>
+                </div>
+              </div>
+            </div>
+
+            {/* Chips & badges */}
+            <div className="panel">
+              <span className="t-tiny" style={{ marginBottom: 14, display: "block" }}>Chips & status</span>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <span className="chip">Planned</span>
+                <span className="chip chip-accent">Active</span>
+                <span className="chip chip-warn"><span className="cardflag yellow"></span> Yellow</span>
+                <span className="chip chip-danger"><span className="cardflag red" style={{ background: "white" }}></span> Red</span>
+                <span className="chip chip-live" style={{ background: "var(--danger)", color: "white", borderColor: "transparent" }}>LIVE</span>
+              </div>
+              <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span className="dot planned"></span><span className="t-small">Planned</span></div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span className="dot prepared"></span><span className="t-small">Prepared</span></div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span className="dot active"></span><span className="t-small">Active</span></div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span className="dot finished"></span><span className="t-small">Finished</span></div>
+              </div>
+            </div>
+
+            {/* Swipe-to-confirm */}
+            <div className="panel">
+              <span className="t-tiny" style={{ marginBottom: 14, display: "block" }}>Swipe to confirm</span>
+              <div className="swipe">
+                <div className="swipe-track">SWIPE TO START MATCH</div>
+                <div className="swipe-thumb"><Icon name="right" className="ico-sm" /></div>
+              </div>
+              <p className="t-small" style={{ margin: "12px 0 0" }}>Used for: start match · end period · start extra time · finish match · finish shootout. 60% threshold + confirmation modal.</p>
+            </div>
+
+            {/* Bottom nav */}
+            <div className="panel" style={{ padding: 0, overflow: "hidden" }}>
+              <div style={{ padding: "24px 24px 12px" }}>
+                <span className="t-tiny">Bottom navigation</span>
+                <p className="t-small" style={{ margin: "6px 0 0" }}>Stable across the app. Icon + label, never icon-only at this level.</p>
+              </div>
+              <div className="bottom-nav">
+                <button><Icon name="home" /><span>Home</span></button>
+                <button><Icon name="team" /><span>Team</span></button>
+                <button className="active"><Icon name="matches" /><span>Matches</span></button>
+                <button><Icon name="stats" /><span>Stats</span></button>
+                <button><Icon name="settings" /><span>More</span></button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Screens */}
+        <section className="section" id="screens">
+          <SectionHead num="06" title="Screens" lede="The system in context. Mobile-first, sideline-ready. Tap a screen and feel the cognitive load — or absence of it." />
+
+          <div className="phones-row">
+            <ScreenLogin />
+            <ScreenMatchList />
+            <ScreenMatchPrep />
+            <ScreenLineupGrid />
+            <ScreenLiveMatch />
+            <ScreenGoalModal />
+            <ScreenSubstitution />
+            <ScreenTimeline />
+            <ScreenLivestream />
+            <ScreenStats />
+          </div>
+        </section>
+
+        <footer style={{ marginTop: 96, paddingTop: 32, borderTop: "1px solid var(--line)", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16, color: "var(--ink-3)", fontSize: 12 }}>
+          <div>BarePitch — Brand & UI Kit · v1.0 · April 2026</div>
+          <div className="t-mono">A coach's match companion · Nothing more.</div>
+        </footer>
+      </main>
+
+      {/* Tweaks panel */}
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Theme">
+          <TweakRadio
+            value={tweaks.theme}
+            onChange={v => setTweak("theme", v)}
+            options={[{ value: "light", label: "Light" }, { value: "dark", label: "Dark" }]}
+          />
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+};
+
+const root = ReactDOM.createRoot(document.getElementById("app"));
+root.render(<App />);
+</script>
+</body>
+</html>
