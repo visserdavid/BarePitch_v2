@@ -13,8 +13,8 @@ $lineupSlots = isset($lineupSlots) && is_array($lineupSlots) ? $lineupSlots : []
 
 $matchId       = (int)   ($match['id']              ?? 0);
 $opponent      = (string)($match['opponent_name']   ?? '');
-$scoreOwn      = (int)   ($match['score_own']       ?? 0);
-$scoreOpponent = (int)   ($match['score_opponent']  ?? 0);
+$scoreOwn      = (int)   ($match['goals_scored']    ?? 0);
+$scoreOpponent = (int)   ($match['goals_conceded']  ?? 0);
 $matchDate     = (string)($match['match_date']      ?? '');
 $teamName      = (string)($team['name']             ?? 'Us');
 ?>

@@ -34,7 +34,7 @@ class PlayerController
         PlayerPolicy::canView($user, $team);
 
         // Load players for the team — use season from team if available
-        $seasonId = (int) ($team['current_season_id'] ?? 0);
+        $seasonId = (int) ($team['season_id'] ?? 0);
         $players  = $seasonId > 0
             ? $this->players->findActiveByTeamAndSeason((int) $team['id'], $seasonId)
             : [];
@@ -101,7 +101,7 @@ class PlayerController
 
         PlayerPolicy::canView($user, $team);
 
-        $seasonId = (int) ($team['current_season_id'] ?? 0);
+        $seasonId = (int) ($team['season_id'] ?? 0);
         if ($seasonId === 0) {
             throw new NotFoundException('Player not found.');
         }

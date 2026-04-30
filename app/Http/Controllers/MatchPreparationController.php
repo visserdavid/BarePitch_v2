@@ -152,7 +152,7 @@ class MatchPreparationController
 
     private function renderPrepView(array $user, array $team, array $match, array $errors): void
     {
-        $seasonId   = (int) ($team['current_season_id'] ?? 0);
+        $seasonId   = (int) ($team['season_id'] ?? 0);
         $players    = $seasonId > 0
             ? $this->players->findActiveByTeamAndSeason((int) $team['id'], $seasonId)
             : [];

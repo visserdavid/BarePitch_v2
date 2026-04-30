@@ -119,9 +119,7 @@ class MatchPreparationService
         Database::beginTransaction();
         try {
             // Reset all selection flags before re-applying (handles re-confirmation on prepared matches)
-            $pdo = \BarePitch\Core\Database::connection();
-            $stmt = $pdo->prepare('UPDATE match_selection SET is_starting = 0, is_on_bench = 0 WHERE match_id = ?');
-            $stmt->execute([(int) $match['id']]);
+            $this->selections->resetStartingFlagsForMatch((int) $match['id']);
 
             // Mark lineup starters
             foreach ($lineupSlots as $slot) {
@@ -168,6 +166,12 @@ class MatchPreparationService
     public function setFormation(array $user, array $match, int $formationId): void
     {
         $this->requirePreparable($match);
+
+        $teamFormations = $this->teams->findFormations((int) $match['team_id']);
+        $validIds = array_column($teamFormations, 'id');
+        if (!in_array($formationId, array_map('intval', $validIds), true)) {
+            throw new DomainException('Formation does not belong to this team.');
+        }
 
         Database::beginTransaction();
         try {

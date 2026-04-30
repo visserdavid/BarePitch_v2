@@ -21,6 +21,14 @@ class SelectionRepository
         return $stmt->fetchAll();
     }
 
+    public function resetStartingFlagsForMatch(int $matchId): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE match_selection SET is_starting = 0, is_on_bench = 0 WHERE match_id = ?'
+        );
+        $stmt->execute([$matchId]);
+    }
+
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare('SELECT * FROM match_selection WHERE id = ?');

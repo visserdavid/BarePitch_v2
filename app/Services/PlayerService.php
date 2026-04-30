@@ -18,7 +18,7 @@ class PlayerService
      * Creates a new player and optionally attaches a season context.
      *
      * @param array $user   Authenticated user row
-     * @param array $team   Current team context row (must include 'id' and optionally 'current_season_id')
+     * @param array $team   Current team context row (must include 'id' and optionally 'season_id')
      * @param array $data   Player data: first_name, last_name, display_name (optional),
      *                      squad_number (optional), preferred_line (optional),
      *                      preferred_foot (optional)
@@ -26,7 +26,7 @@ class PlayerService
      */
     public function create(array $user, array $team, array $data): int
     {
-        $seasonId = (int) ($team['current_season_id'] ?? 0);
+        $seasonId = (int) ($team['season_id'] ?? 0);
 
         Database::beginTransaction();
         try {

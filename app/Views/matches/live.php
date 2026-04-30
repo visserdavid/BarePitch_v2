@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 // Variables provided via extract($data) or via show.php include:
-// $match:   array  — match record (id, opponent_name, score_own, score_opponent, status)
+// $match:   array  — match record (id, opponent_name, goals_scored, goals_conceded, status)
 // $team:    array  — active team
 // $period:  array|null — current period row
 // $events:  array  — event rows
@@ -17,8 +17,8 @@ $errors  = isset($errors)  && is_array($errors)  ? $errors  : [];
 
 $matchId       = (int)   ($match['id']              ?? 0);
 $opponent      = (string)($match['opponent_name']   ?? '');
-$scoreOwn      = (int)   ($match['score_own']       ?? 0);
-$scoreOpponent = (int)   ($match['score_opponent']  ?? 0);
+$scoreOwn      = (int)   ($match['goals_scored']    ?? 0);
+$scoreOpponent = (int)   ($match['goals_conceded']  ?? 0);
 $teamName      = (string)($team['name']             ?? 'Us');
 
 $periodLabel   = $period ? (string)($period['label'] ?? 'Period') : 'Not started';
@@ -67,6 +67,7 @@ $periodLabel   = $period ? (string)($period['label'] ?? 'Period') : 'Not started
     <?php if ($period === null): ?>
       <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/start">
         <?php include __DIR__ . '/../partials/csrf.php'; ?>
+        <input type="hidden" name="confirm" value="1">
         <button type="submit" class="btn btn-primary">Start first half</button>
       </form>
     <?php else: ?>
@@ -133,7 +134,7 @@ $periodLabel   = $period ? (string)($period['label'] ?? 'Period') : 'Not started
           <?php foreach ($players as $p): ?>
             <?php
             $pid   = (int)   ($p['id']           ?? 0);
-            $pName = (string)($p['name']          ?? '');
+            $pName = (string)($p['display_name']   ?? '');
             $pNum  = (string)($p['shirt_number']  ?? '');
             ?>
             <option value="<?= htmlspecialchars((string)$pid, ENT_QUOTES, 'UTF-8') ?>">
@@ -155,7 +156,7 @@ $periodLabel   = $period ? (string)($period['label'] ?? 'Period') : 'Not started
           <?php foreach ($players as $p): ?>
             <?php
             $pid   = (int)   ($p['id']           ?? 0);
-            $pName = (string)($p['name']          ?? '');
+            $pName = (string)($p['display_name']   ?? '');
             $pNum  = (string)($p['shirt_number']  ?? '');
             ?>
             <option value="<?= htmlspecialchars((string)$pid, ENT_QUOTES, 'UTF-8') ?>">
@@ -222,7 +223,7 @@ $periodLabel   = $period ? (string)($period['label'] ?? 'Period') : 'Not started
           <?php foreach ($players as $p): ?>
             <?php
             $pid   = (int)   ($p['id']           ?? 0);
-            $pName = (string)($p['name']          ?? '');
+            $pName = (string)($p['display_name']   ?? '');
             $pNum  = (string)($p['shirt_number']  ?? '');
             ?>
             <option value="<?= htmlspecialchars((string)$pid, ENT_QUOTES, 'UTF-8') ?>">
@@ -244,7 +245,7 @@ $periodLabel   = $period ? (string)($period['label'] ?? 'Period') : 'Not started
           <?php foreach ($players as $p): ?>
             <?php
             $pid   = (int)   ($p['id']           ?? 0);
-            $pName = (string)($p['name']          ?? '');
+            $pName = (string)($p['display_name']   ?? '');
             $pNum  = (string)($p['shirt_number']  ?? '');
             ?>
             <option value="<?= htmlspecialchars((string)$pid, ENT_QUOTES, 'UTF-8') ?>">
@@ -349,12 +350,7 @@ $periodLabel   = $period ? (string)($period['label'] ?? 'Period') : 'Not started
               <?= $evNote !== '' ? '· ' . htmlspecialchars($evNote, ENT_QUOTES, 'UTF-8') : '' ?>
             </span>
           </span>
-          <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/events/<?= htmlspecialchars((string)$evId, ENT_QUOTES, 'UTF-8') ?>/delete">
-            <?php include __DIR__ . '/../partials/csrf.php'; ?>
-            <button type="submit" class="tl-edit" title="Delete event" onclick="return confirm('Delete this event?');">
-              <svg class="bp-icon" aria-hidden="true"><use href="/assets/barepitch-icons.svg#bp-icon-trash"></use></svg>
-            </button>
-          </form>
+          <!-- Event deletion not implemented in v0.1.0 -->
         </div>
       <?php endforeach; ?>
     </div>
@@ -366,6 +362,7 @@ $periodLabel   = $period ? (string)($period['label'] ?? 'Period') : 'Not started
   <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/finish"
         onsubmit="return confirm('Are you sure you want to finish this match? This cannot be undone.');">
     <?php include __DIR__ . '/../partials/csrf.php'; ?>
+    <input type="hidden" name="confirm" value="1">
     <button type="submit" class="btn btn-danger btn-lg btn-block">Finish match</button>
     <p class="t-tiny" style="text-align:center;margin-top:var(--s-3);color:var(--ink-3);">
       This will end the match and lock all events. The action cannot be reversed.

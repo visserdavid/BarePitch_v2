@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-// $matches: array of match rows, each with at least: id, opponent_name, status, match_date, score_own, score_opponent
+// $matches: array of match rows, each with at least: id, opponent_name, status, match_date, goals_scored, goals_conceded
 // $team:    array — the active team
 $matches = isset($matches) && is_array($matches) ? $matches : [];
 $team    = isset($team)    && is_array($team)    ? $team    : [];
@@ -64,8 +64,8 @@ foreach ($grouped as $bucket) {
           $matchId       = (int)   ($match['id']              ?? 0);
           $opponent      = (string)($match['opponent_name']   ?? '');
           $status        = (string)($match['status']          ?? 'planned');
-          $scoreOwn      = isset($match['score_own'])      ? (int)$match['score_own']      : null;
-          $scoreOpponent = isset($match['score_opponent']) ? (int)$match['score_opponent'] : null;
+          $scoreOwn      = isset($match['goals_scored'])   ? (int)$match['goals_scored']   : null;
+          $scoreOpponent = isset($match['goals_conceded']) ? (int)$match['goals_conceded'] : null;
           $matchDate     = (string)($match['match_date']      ?? '');
           ?>
           <a href="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>"

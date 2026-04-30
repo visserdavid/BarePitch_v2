@@ -44,8 +44,8 @@ $recentMatches = isset($recentMatches) && is_array($recentMatches) ? $recentMatc
           $matchId      = (int)   ($match['id']              ?? 0);
           $opponent     = (string)($match['opponent_name']   ?? '');
           $status       = (string)($match['status']          ?? 'planned');
-          $scoreOwn     = isset($match['score_own'])      ? (int)$match['score_own']      : null;
-          $scoreOpponent= isset($match['score_opponent']) ? (int)$match['score_opponent'] : null;
+          $scoreOwn     = isset($match['goals_scored'])   ? (int)$match['goals_scored']   : null;
+          $scoreOpponent= isset($match['goals_conceded']) ? (int)$match['goals_conceded'] : null;
           $matchDate    = (string)($match['match_date']      ?? '');
           ?>
           <a href="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>"

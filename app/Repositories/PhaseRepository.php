@@ -16,8 +16,9 @@ class PhaseRepository
         $stmt = $this->pdo->prepare(
             'SELECT p.* FROM phase p
              INNER JOIN season s ON s.id = p.season_id
-             WHERE s.team_id = ? AND s.is_active = 1
-             ORDER BY p.sort_order, p.id'
+             INNER JOIN team t ON t.season_id = s.id
+             WHERE t.id = ? AND s.is_active = 1
+             ORDER BY p.number, p.id'
         );
         $stmt->execute([$teamId]);
         return $stmt->fetchAll() ?: [];

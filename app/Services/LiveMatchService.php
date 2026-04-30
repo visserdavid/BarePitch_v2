@@ -86,6 +86,17 @@ class LiveMatchService
             throw new DomainException('Invalid team side for goal registration.');
         }
 
+        // Verify player_selection_id belongs to this match if provided
+        $playerSelectionId = isset($data['player_selection_id']) && $data['player_selection_id'] !== null
+            ? (int) $data['player_selection_id']
+            : null;
+        if ($playerSelectionId !== null) {
+            $selection = $this->selections->findById($playerSelectionId);
+            if (!$selection || (int)$selection['match_id'] !== (int)$match['id']) {
+                throw new DomainException('Player selection does not belong to this match.');
+            }
+        }
+
         // Get current period (regular_1 or regular_2)
         $periods = $this->matches->findPeriods((int) $match['id']);
         $activePeriod = null;
