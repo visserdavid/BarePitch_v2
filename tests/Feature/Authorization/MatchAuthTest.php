@@ -139,6 +139,16 @@ class MatchAuthTest extends TestCase
         MatchPolicy::canPrepare($user, $match);
     }
 
+    public function testCoachCanPreparePreparedMatch(): void
+    {
+        $user  = $this->buildUser(self::COACH_ID, 'coach');
+        $match = $this->buildMatch('prepared');
+
+        // Must not throw — a coach may re-prepare an already-prepared match
+        MatchPolicy::canPrepare($user, $match);
+        $this->assertTrue(true);
+    }
+
     // ----------------------------------------------------------------
     // Private helpers
     // ----------------------------------------------------------------

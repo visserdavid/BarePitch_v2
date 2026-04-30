@@ -35,6 +35,7 @@ class DevLoginTest extends FeatureTestCase
      */
     public function testDevLoginServiceThrowsWhenDisabled(): void
     {
+        $this->addTearDownCallback(fn() => putenv('ENABLE_DEV_LOGIN=true'));
         putenv('ENABLE_DEV_LOGIN=false');
 
         $pdo        = static::$db;
@@ -43,8 +44,6 @@ class DevLoginTest extends FeatureTestCase
 
         $this->expectException(\RuntimeException::class);
         $authService->loginAs(static::$coachId);
-
-        putenv('ENABLE_DEV_LOGIN=true'); // restore
     }
 
     // ----------------------------------------------------------------
@@ -77,30 +76,6 @@ class DevLoginTest extends FeatureTestCase
 
         $this->expectException(\InvalidArgumentException::class);
         $authService->loginAs(999999);
-    }
-
-    // ----------------------------------------------------------------
-    // AuthController::devLoginForm — enabled, controller-level guard
-    // ----------------------------------------------------------------
-
-    /**
-     * Verifies that the controller method immediately calls Response::abort(404)
-     * (which exits) when ENABLE_DEV_LOGIN is not 'true'.
-     *
-     * We detect this by confirming the controller calls exit via the
-     * observable side effect: no session change and the exit exception/call.
-     *
-     * Since we cannot intercept exit() without process isolation, we verify
-     * the guard condition directly: the env var check matches 'true'.
-     */
-    public function testControllerGateCheckIsCorrectCondition(): void
-    {
-        // The controller checks: getenv('ENABLE_DEV_LOGIN') !== 'true'
-        putenv('ENABLE_DEV_LOGIN=false');
-        $this->assertNotSame('true', getenv('ENABLE_DEV_LOGIN'));
-
-        putenv('ENABLE_DEV_LOGIN=true');
-        $this->assertSame('true', getenv('ENABLE_DEV_LOGIN'));
     }
 
     // ----------------------------------------------------------------

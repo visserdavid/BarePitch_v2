@@ -71,6 +71,13 @@ class MatchStateTest extends FeatureTestCase
         $this->assertCount(1, $periods);
         $this->assertSame('regular_1', $periods[0]['period_key']);
         $this->assertNotNull($periods[0]['started_at']);
+
+        // At least one selection must be activated on the field
+        $activeSelections = $this->fetchAll(
+            'SELECT id FROM match_selection WHERE match_id = ? AND is_active_on_field = 1',
+            [$matchId]
+        );
+        $this->assertNotEmpty($activeSelections, 'Expected at least one selection with is_active_on_field = 1 after startMatch');
     }
 
     // ----------------------------------------------------------------
@@ -107,8 +114,10 @@ class MatchStateTest extends FeatureTestCase
         // Must not throw
         $this->service->finishMatch($user, $match);
 
-        $updated = $this->fetchOne('SELECT status FROM `match` WHERE id = ?', [$matchId]);
+        $updated = $this->fetchOne('SELECT status, active_phase, finished_at FROM `match` WHERE id = ?', [$matchId]);
         $this->assertSame('finished', $updated['status']);
+        $this->assertSame('finished', $updated['active_phase']);
+        $this->assertNotNull($updated['finished_at']);
     }
 
     // ----------------------------------------------------------------

@@ -146,6 +146,33 @@ class MatchPreparationTest extends FeatureTestCase
 
         $updated = $this->fetchOne('SELECT status FROM `match` WHERE id = ?', [$matchId]);
         $this->assertSame('prepared', $updated['status']);
+
+        // All 11 slotted selections must be marked as starters
+        $selections = $this->fetchAll(
+            'SELECT is_starting, is_on_bench FROM match_selection WHERE match_id = ?',
+            [$matchId]
+        );
+        $this->assertCount(11, $selections);
+
+        $slottedIds = array_column($slots, 'match_selection_id');
+        $slottedSelections = $this->fetchAll(
+            'SELECT id, is_starting FROM match_selection WHERE match_id = ? AND id IN (' .
+            implode(',', array_fill(0, count($slottedIds), '?')) . ')',
+            array_merge([$matchId], $slottedIds)
+        );
+        foreach ($slottedSelections as $sel) {
+            $this->assertSame(1, (int) $sel['is_starting'], "Selection {$sel['id']} should have is_starting = 1");
+        }
+
+        // Any present-but-unslotted players should have is_on_bench = 1
+        $unslottedSelections = $this->fetchAll(
+            'SELECT id, is_on_bench FROM match_selection WHERE match_id = ? AND id NOT IN (' .
+            implode(',', array_fill(0, count($slottedIds), '?')) . ')',
+            array_merge([$matchId], $slottedIds)
+        );
+        foreach ($unslottedSelections as $sel) {
+            $this->assertSame(1, (int) $sel['is_on_bench'], "Selection {$sel['id']} should have is_on_bench = 1");
+        }
     }
 
     // ----------------------------------------------------------------
