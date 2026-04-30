@@ -23,14 +23,8 @@ $teamName      = (string)($team['name']             ?? 'Us');
 
 $periodLabel   = $period ? (string)($period['label'] ?? 'Period') : 'Not started';
 
-$eventTypes = [
-    'goal'        => ['label' => 'Goal',        'icon' => 'goal'],
-    'penalty'     => ['label' => 'Penalty',     'icon' => 'goal'],
-    'yellow_card' => ['label' => 'Yellow card', 'icon' => 'card'],
-    'red_card'    => ['label' => 'Red card',    'icon' => 'card'],
-    'note'        => ['label' => 'Note',        'icon' => 'note'],
-];
 ?>
+<!-- v0.1.0: only goal registration is implemented -->
 
 <!-- ── Score bar ─────────────────────────── -->
 <div class="bp-live-bar" style="margin-bottom:var(--s-4);">
@@ -93,111 +87,210 @@ $eventTypes = [
   </div>
 </div>
 
-<!-- ── Goal / Event registration ─────────────────────────── -->
+<!-- ── Goal registration ─────────────────────────── -->
 <div class="bp-section">
   <h2 class="t-h3" style="margin:0 0 var(--s-4);">Register event</h2>
 
-  <!-- Toggle buttons for each event type -->
+  <!-- Toggle buttons — goals only in v0.1.0 -->
   <div class="bp-cluster" style="margin-bottom:var(--s-4);">
-    <?php foreach ($eventTypes as $typeKey => $typeData): ?>
-      <button
-        type="button"
-        class="btn btn-secondary btn-sm"
-        onclick="document.querySelectorAll('.event-form').forEach(el=>el.hidden=true);document.getElementById('form-<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>').hidden=false;"
-        aria-controls="form-<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>"
-      >
-        + <?= htmlspecialchars($typeData['label'], ENT_QUOTES, 'UTF-8') ?>
-      </button>
-    <?php endforeach; ?>
+    <button
+      type="button"
+      class="btn btn-secondary btn-sm"
+      onclick="document.querySelectorAll('.event-form').forEach(el=>el.hidden=true);document.getElementById('form-goal-own').hidden=false;"
+      aria-controls="form-goal-own"
+    >
+      + Goal (<?= htmlspecialchars($teamName, ENT_QUOTES, 'UTF-8') ?>)
+    </button>
+    <button
+      type="button"
+      class="btn btn-secondary btn-sm"
+      onclick="document.querySelectorAll('.event-form').forEach(el=>el.hidden=true);document.getElementById('form-goal-opponent').hidden=false;"
+      aria-controls="form-goal-opponent"
+    >
+      + Goal (<?= htmlspecialchars($opponent, ENT_QUOTES, 'UTF-8') ?>)
+    </button>
   </div>
 
-  <!-- Inline event forms (JS-toggled) -->
-  <?php foreach ($eventTypes as $typeKey => $typeData): ?>
-    <div id="form-<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>" class="event-form bp-card" hidden>
-      <h3 class="t-h3" style="margin:0 0 var(--s-4);"><?= htmlspecialchars($typeData['label'], ENT_QUOTES, 'UTF-8') ?></h3>
-      <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/events/<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>" class="bp-stack">
-        <?php include __DIR__ . '/../partials/csrf.php'; ?>
-        <input type="hidden" name="event_type" value="<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>">
+  <!-- v0.1.0: cards/notes not yet implemented -->
 
-        <!-- Side (own/opponent) — only for score events and cards -->
-        <?php if (in_array($typeKey, ['goal', 'penalty', 'yellow_card', 'red_card'], true)): ?>
-          <div class="field">
-            <label>Side</label>
-            <div class="bp-cluster">
-              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-                <input type="radio" name="team_side" value="own" checked style="accent-color:var(--accent);">
-                <span class="t-small"><?= htmlspecialchars($teamName, ENT_QUOTES, 'UTF-8') ?></span>
-              </label>
-              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-                <input type="radio" name="team_side" value="opponent" style="accent-color:var(--accent);">
-                <span class="t-small"><?= htmlspecialchars($opponent, ENT_QUOTES, 'UTF-8') ?></span>
-              </label>
-            </div>
-          </div>
-        <?php endif; ?>
+  <!-- Own-goal form -->
+  <div id="form-goal-own" class="event-form bp-card" hidden>
+    <h3 class="t-h3" style="margin:0 0 var(--s-4);">Goal — <?= htmlspecialchars($teamName, ENT_QUOTES, 'UTF-8') ?></h3>
+    <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/events/goal" class="bp-stack">
+      <?php include __DIR__ . '/../partials/csrf.php'; ?>
+      <input type="hidden" name="team_side" value="own">
 
-        <!-- Player picker (own team only — shown for goal/penalty/cards) -->
-        <?php if (in_array($typeKey, ['goal', 'penalty', 'yellow_card', 'red_card'], true) && !empty($players)): ?>
-          <div class="field">
-            <label for="player_id_<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>">Player <span class="muted">(optional for own team)</span></label>
-            <select
-              id="player_id_<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>"
-              name="player_id"
-              class="input"
-            >
-              <option value="">— unknown —</option>
-              <?php foreach ($players as $p): ?>
-                <?php
-                $pid   = (int)   ($p['id']           ?? 0);
-                $pName = (string)($p['name']          ?? '');
-                $pNum  = (string)($p['shirt_number']  ?? '');
-                ?>
-                <option value="<?= htmlspecialchars((string)$pid, ENT_QUOTES, 'UTF-8') ?>">
-                  <?= htmlspecialchars($pNum !== '' ? "#{$pNum} {$pName}" : $pName, ENT_QUOTES, 'UTF-8') ?>
-                </option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-        <?php endif; ?>
+      <!-- Player picker (required for own-team goals) -->
+      <div class="field">
+        <label for="player_selection_id_own">Player <span class="req" aria-hidden="true">*</span></label>
+        <select
+          id="player_selection_id_own"
+          name="player_selection_id"
+          class="input"
+          required
+        >
+          <option value="">— select player —</option>
+          <?php foreach ($players as $p): ?>
+            <?php
+            $pid   = (int)   ($p['id']           ?? 0);
+            $pName = (string)($p['name']          ?? '');
+            $pNum  = (string)($p['shirt_number']  ?? '');
+            ?>
+            <option value="<?= htmlspecialchars((string)$pid, ENT_QUOTES, 'UTF-8') ?>">
+              <?= htmlspecialchars($pNum !== '' ? "#{$pNum} {$pName}" : $pName, ENT_QUOTES, 'UTF-8') ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
 
-        <!-- Minute -->
-        <div class="field">
-          <label for="minute_<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>">Minute</label>
-          <input
-            id="minute_<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>"
-            type="number"
-            name="minute"
-            class="input"
-            min="1"
-            max="200"
-            placeholder="e.g. 23"
-          >
-        </div>
+      <!-- Assist picker (optional) -->
+      <div class="field">
+        <label for="assist_selection_id_own">Assist <span class="muted">(optional)</span></label>
+        <select
+          id="assist_selection_id_own"
+          name="assist_selection_id"
+          class="input"
+        >
+          <option value="">— none —</option>
+          <?php foreach ($players as $p): ?>
+            <?php
+            $pid   = (int)   ($p['id']           ?? 0);
+            $pName = (string)($p['name']          ?? '');
+            $pNum  = (string)($p['shirt_number']  ?? '');
+            ?>
+            <option value="<?= htmlspecialchars((string)$pid, ENT_QUOTES, 'UTF-8') ?>">
+              <?= htmlspecialchars($pNum !== '' ? "#{$pNum} {$pName}" : $pName, ENT_QUOTES, 'UTF-8') ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
 
-        <!-- Note text (always shown for note type, optional for others) -->
-        <?php if ($typeKey === 'note'): ?>
-          <div class="field">
-            <label for="note_<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>">Note</label>
-            <textarea
-              id="note_<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>"
-              name="note"
-              class="input"
-              maxlength="500"
-              placeholder="Describe the event..."
-            ></textarea>
-          </div>
-        <?php endif; ?>
+      <!-- Zone (optional) -->
+      <div class="field">
+        <label for="zone_code_own">Zone <span class="muted">(optional)</span></label>
+        <input
+          id="zone_code_own"
+          type="text"
+          name="zone_code"
+          class="input"
+          maxlength="20"
+          placeholder="e.g. box"
+        >
+      </div>
 
-        <div class="bp-cluster" style="justify-content:flex-end;">
-          <button type="button" class="btn btn-ghost btn-sm"
-            onclick="document.getElementById('form-<?= htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8') ?>').hidden=true;">
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-primary btn-sm">Save event</button>
-        </div>
-      </form>
-    </div>
-  <?php endforeach; ?>
+      <!-- Minute (required) -->
+      <div class="field">
+        <label for="minute_display_own">Minute <span class="req" aria-hidden="true">*</span></label>
+        <input
+          id="minute_display_own"
+          type="number"
+          name="minute_display"
+          class="input"
+          min="1"
+          max="200"
+          placeholder="e.g. 23"
+          required
+        >
+      </div>
+
+      <div class="bp-cluster" style="justify-content:flex-end;">
+        <button type="button" class="btn btn-ghost btn-sm"
+          onclick="document.getElementById('form-goal-own').hidden=true;">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary btn-sm">Save goal</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Opponent-goal form -->
+  <div id="form-goal-opponent" class="event-form bp-card" hidden>
+    <h3 class="t-h3" style="margin:0 0 var(--s-4);">Goal — <?= htmlspecialchars($opponent, ENT_QUOTES, 'UTF-8') ?></h3>
+    <form method="post" action="/matches/<?= htmlspecialchars((string)$matchId, ENT_QUOTES, 'UTF-8') ?>/events/goal" class="bp-stack">
+      <?php include __DIR__ . '/../partials/csrf.php'; ?>
+      <input type="hidden" name="team_side" value="opponent">
+
+      <!-- Player picker (optional for opponent goals) -->
+      <div class="field">
+        <label for="player_selection_id_opponent">Player <span class="muted">(optional)</span></label>
+        <select
+          id="player_selection_id_opponent"
+          name="player_selection_id"
+          class="input"
+        >
+          <option value="">— unknown —</option>
+          <?php foreach ($players as $p): ?>
+            <?php
+            $pid   = (int)   ($p['id']           ?? 0);
+            $pName = (string)($p['name']          ?? '');
+            $pNum  = (string)($p['shirt_number']  ?? '');
+            ?>
+            <option value="<?= htmlspecialchars((string)$pid, ENT_QUOTES, 'UTF-8') ?>">
+              <?= htmlspecialchars($pNum !== '' ? "#{$pNum} {$pName}" : $pName, ENT_QUOTES, 'UTF-8') ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
+      <!-- Assist picker (optional) -->
+      <div class="field">
+        <label for="assist_selection_id_opponent">Assist <span class="muted">(optional)</span></label>
+        <select
+          id="assist_selection_id_opponent"
+          name="assist_selection_id"
+          class="input"
+        >
+          <option value="">— none —</option>
+          <?php foreach ($players as $p): ?>
+            <?php
+            $pid   = (int)   ($p['id']           ?? 0);
+            $pName = (string)($p['name']          ?? '');
+            $pNum  = (string)($p['shirt_number']  ?? '');
+            ?>
+            <option value="<?= htmlspecialchars((string)$pid, ENT_QUOTES, 'UTF-8') ?>">
+              <?= htmlspecialchars($pNum !== '' ? "#{$pNum} {$pName}" : $pName, ENT_QUOTES, 'UTF-8') ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
+      <!-- Zone (optional) -->
+      <div class="field">
+        <label for="zone_code_opponent">Zone <span class="muted">(optional)</span></label>
+        <input
+          id="zone_code_opponent"
+          type="text"
+          name="zone_code"
+          class="input"
+          maxlength="20"
+          placeholder="e.g. box"
+        >
+      </div>
+
+      <!-- Minute (required) -->
+      <div class="field">
+        <label for="minute_display_opponent">Minute <span class="req" aria-hidden="true">*</span></label>
+        <input
+          id="minute_display_opponent"
+          type="number"
+          name="minute_display"
+          class="input"
+          min="1"
+          max="200"
+          placeholder="e.g. 23"
+          required
+        >
+      </div>
+
+      <div class="bp-cluster" style="justify-content:flex-end;">
+        <button type="button" class="btn btn-ghost btn-sm"
+          onclick="document.getElementById('form-goal-opponent').hidden=true;">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary btn-sm">Save goal</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- ── Event timeline ─────────────────────────── -->
