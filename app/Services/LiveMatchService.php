@@ -38,6 +38,7 @@ class LiveMatchService
 
         Database::beginTransaction();
         try {
+            $this->locks->acquireOrRefresh((int) $match['id'], (int) $user['id'], 120);
             $this->matches->updateStatus((int) $match['id'], MatchStatus::Active->value, 'regular_time');
             $this->matches->updateScore((int) $match['id'], 0, 0);
 
@@ -97,6 +98,7 @@ class LiveMatchService
 
         Database::beginTransaction();
         try {
+            $this->locks->acquireOrRefresh((int) $match['id'], (int) $user['id'], 120);
             $eventId = $this->events->create([
                 'match_id'             => $match['id'],
                 'period_id'            => $activePeriod ? $activePeriod['id'] : null,
@@ -151,6 +153,7 @@ class LiveMatchService
 
         Database::beginTransaction();
         try {
+            $this->locks->acquireOrRefresh((int) $match['id'], (int) $user['id'], 120);
             $eventId = $this->events->create([
                 'match_id'             => $match['id'],
                 'period_id'            => $activePeriod ? $activePeriod['id'] : null,
@@ -187,7 +190,7 @@ class LiveMatchService
      * Score recalculation. MUST be called inside the caller's transaction.
      * Fetches score events and runs ScoreCalculator — never blind-increments.
      */
-    public function recalculateScore(int $matchId): void
+    private function recalculateScore(int $matchId): void
     {
         $scoreEvents = $this->events->getScoreEvents($matchId);
         $score       = ScoreCalculator::calculate($scoreEvents);
@@ -222,10 +225,11 @@ class LiveMatchService
             throw new DomainException('Period has already ended.');
         }
 
-        $newActivePhase = $period['period_key'] === PeriodKey::Regular1->value ? 'halftime' : 'none';
+        $newActivePhase = $period['period_key'] === PeriodKey::Regular1->value ? 'halftime' : 'finished';
 
         Database::beginTransaction();
         try {
+            $this->locks->acquireOrRefresh((int) $match['id'], (int) $user['id'], 120);
             $this->matches->updatePeriod($periodId, ['ended_at' => date('Y-m-d H:i:s')]);
             $this->matches->update((int) $match['id'], ['active_phase' => $newActivePhase]);
             $this->audit->log(
@@ -263,6 +267,7 @@ class LiveMatchService
 
         Database::beginTransaction();
         try {
+            $this->locks->acquireOrRefresh((int) $match['id'], (int) $user['id'], 120);
             $this->matches->createPeriod([
                 'match_id'                    => $match['id'],
                 'period_key'                  => PeriodKey::Regular2->value,

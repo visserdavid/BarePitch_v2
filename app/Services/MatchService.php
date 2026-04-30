@@ -84,7 +84,7 @@ class MatchService
     }
 
     /**
-     * Soft-deletes a match. Only allowed for planned matches with no events.
+     * Soft-deletes a match. Only allowed for planned matches.
      */
     public function delete(array $user, array $match): void
     {

@@ -118,6 +118,11 @@ class MatchPreparationService
 
         Database::beginTransaction();
         try {
+            // Reset all selection flags before re-applying (handles re-confirmation on prepared matches)
+            $pdo = \BarePitch\Core\Database::connection();
+            $stmt = $pdo->prepare('UPDATE match_selection SET is_starting = 0, is_on_bench = 0 WHERE match_id = ?');
+            $stmt->execute([(int) $match['id']]);
+
             // Mark lineup starters
             foreach ($lineupSlots as $slot) {
                 if ($slot['formation_position_id'] !== null) {
