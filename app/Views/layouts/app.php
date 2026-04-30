@@ -1,10 +1,15 @@
 <?php
 declare(strict_types=1);
 
-$title = isset($title) && is_string($title) ? $title : 'BarePitch';
-$theme = isset($theme) && $theme === 'dark' ? 'dark' : 'light';
-$bodyClass = isset($bodyClass) && is_string($bodyClass) ? $bodyClass : '';
-$content = isset($content) && is_string($content) ? $content : '';
+$title      = isset($title)      && is_string($title)      ? $title      : 'BarePitch';
+$theme      = isset($theme)      && $theme === 'dark'       ? 'dark'      : 'light';
+$bodyClass  = isset($bodyClass)  && is_string($bodyClass)   ? $bodyClass  : '';
+$content    = isset($content)    && is_string($content)     ? $content    : '';
+// When $hideNav is truthy the bottom navigation is suppressed (e.g. dev-login).
+$hideNav    = !empty($hideNav);
+// $flash and $currentPath are passed through for partials.
+$flash       = isset($flash)       && is_array($flash)       ? $flash       : [];
+$currentPath = isset($currentPath) && is_string($currentPath) ? $currentPath : '/';
 ?>
 <!doctype html>
 <html lang="en" data-theme="<?= htmlspecialchars($theme, ENT_QUOTES, 'UTF-8') ?>">
@@ -30,7 +35,12 @@ $content = isset($content) && is_string($content) ? $content : '';
   </header>
 
   <main class="bp-app-shell">
+    <?php include __DIR__ . '/../partials/flash.php'; ?>
     <?= $content ?>
   </main>
+
+  <?php if (!$hideNav): ?>
+    <?php include __DIR__ . '/../partials/bottom-nav.php'; ?>
+  <?php endif; ?>
 </body>
 </html>
