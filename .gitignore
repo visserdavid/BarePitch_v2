@@ -18,6 +18,8 @@
 /backups/
 /exports/
 *.sql
+!database/migrations/*.sql
+!database/seeds/*.sql
 *.sqlite
 *.sqlite3
 
