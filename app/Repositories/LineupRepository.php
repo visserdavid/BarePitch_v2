@@ -12,6 +12,7 @@ class LineupRepository
     {
         $stmt = $this->pdo->prepare(
             'SELECT mls.*, fp.label AS position_label, fp.grid_row AS fp_row, fp.grid_col AS fp_col,
+                    fp.formation_id AS formation_id,
                     p.display_name AS player_name
              FROM match_lineup_slot mls
              LEFT JOIN formation_position fp ON fp.id = mls.formation_position_id
