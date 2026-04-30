@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace BarePitch\Http\Controllers;
 
 use BarePitch\Core\Csrf;
-use BarePitch\Core\Database;
 use BarePitch\Core\Request;
 use BarePitch\Core\Response;
 use BarePitch\Core\View;
@@ -13,9 +12,10 @@ use BarePitch\Core\Exceptions\NotFoundException;
 use BarePitch\Core\Exceptions\ValidationException;
 use BarePitch\Http\Requests\CreateMatchRequest;
 use BarePitch\Policies\MatchPolicy;
-use BarePitch\Repositories\MatchRepository;
 use BarePitch\Repositories\EventRepository;
 use BarePitch\Repositories\LineupRepository;
+use BarePitch\Repositories\MatchRepository;
+use BarePitch\Repositories\PhaseRepository;
 use BarePitch\Repositories\SelectionRepository;
 use BarePitch\Services\AuthService;
 use BarePitch\Services\MatchService;
@@ -31,6 +31,7 @@ class MatchController
         private readonly SelectionRepository $selections,
         private readonly LineupRepository   $lineup,
         private readonly EventRepository    $events,
+        private readonly PhaseRepository    $phases,
     ) {}
 
     public function index(Request $request, array $params = []): void
@@ -53,7 +54,7 @@ class MatchController
 
         MatchPolicy::canCreate($user, $team);
 
-        $phases = $this->loadPhases((int) $team['id']);
+        $phases = $this->phases->findByTeam((int) $team['id']);
 
         echo View::layout('matches/create', [
             'team'   => $team,
@@ -77,7 +78,7 @@ class MatchController
             $data    = CreateMatchRequest::validate($request);
             $matchId = $this->matchService->create($user, $team, $data);
         } catch (ValidationException $e) {
-            $phases = $this->loadPhases((int) $team['id']);
+            $phases = $this->phases->findByTeam((int) $team['id']);
             echo View::layout('matches/create', [
                 'team'   => $team,
                 'phases' => $phases,
@@ -146,7 +147,7 @@ class MatchController
 
         MatchPolicy::canEdit($user, $match);
 
-        $phases = $this->loadPhases((int) $team['id']);
+        $phases = $this->phases->findByTeam((int) $team['id']);
 
         echo View::layout('matches/create', [
             'match'  => $match,
@@ -176,7 +177,7 @@ class MatchController
             $data = CreateMatchRequest::validate($request);
             $this->matchService->update($user, $match, $data);
         } catch (ValidationException $e) {
-            $phases = $this->loadPhases((int) $team['id']);
+            $phases = $this->phases->findByTeam((int) $team['id']);
             echo View::layout('matches/create', [
                 'match'  => $match,
                 'team'   => $team,
@@ -191,21 +192,4 @@ class MatchController
         Response::redirect('/matches/' . $match['id']);
     }
 
-    /** Load season phases for the team (for the create/edit form). */
-    private function loadPhases(int $teamId): array
-    {
-        try {
-            $pdo  = Database::connection();
-            $stmt = $pdo->prepare(
-                'SELECT p.* FROM phase p
-                 INNER JOIN season s ON s.id = p.season_id
-                 WHERE s.team_id = ? AND s.is_active = 1
-                 ORDER BY p.sort_order, p.id'
-            );
-            $stmt->execute([$teamId]);
-            return $stmt->fetchAll();
-        } catch (\Throwable) {
-            return [];
-        }
-    }
 }

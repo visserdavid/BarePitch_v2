@@ -24,6 +24,7 @@ use BarePitch\Repositories\EventRepository;
 use BarePitch\Repositories\LineupRepository;
 use BarePitch\Repositories\LockRepository;
 use BarePitch\Repositories\MatchRepository;
+use BarePitch\Repositories\PhaseRepository;
 use BarePitch\Repositories\PlayerRepository;
 use BarePitch\Repositories\SelectionRepository;
 use BarePitch\Repositories\TeamRepository;
@@ -35,6 +36,7 @@ use BarePitch\Services\AuthService;
 use BarePitch\Services\LiveMatchService;
 use BarePitch\Services\MatchPreparationService;
 use BarePitch\Services\MatchService;
+use BarePitch\Services\PlayerService;
 use BarePitch\Services\TeamContextService;
 
 // ── Controllers ────────────────────────────────────────────────────────────
@@ -58,6 +60,7 @@ $pdo = Database::connection();
 $userRepo      = new UserRepository($pdo);
 $teamRepo      = new TeamRepository($pdo);
 $playerRepo    = new PlayerRepository($pdo);
+$phaseRepo     = new PhaseRepository($pdo);
 $matchRepo     = new MatchRepository($pdo);
 $selectionRepo = new SelectionRepository($pdo);
 $lineupRepo    = new LineupRepository($pdo);
@@ -69,6 +72,7 @@ $lockRepo      = new LockRepository($pdo);
 $auditService   = new AuditService($auditRepo);
 $authService    = new AuthService($userRepo);
 $teamCtxService = new TeamContextService($teamRepo);
+$playerService  = new PlayerService($playerRepo, $auditService);
 $matchService   = new MatchService($matchRepo, $auditService);
 $prepService    = new MatchPreparationService(
     $matchRepo,
@@ -89,7 +93,7 @@ $liveService    = new LiveMatchService(
 $homeCtrl  = new HomeController($authService, $teamCtxService, $matchRepo, $teamRepo, $userRepo);
 $authCtrl  = new AuthController($authService, $userRepo);
 $ctxCtrl   = new ContextController($authService, $teamCtxService);
-$playerCtrl = new PlayerController($authService, $teamCtxService, $playerRepo);
+$playerCtrl = new PlayerController($authService, $teamCtxService, $playerRepo, $playerService);
 $matchCtrl  = new MatchController(
     $authService,
     $teamCtxService,
@@ -97,7 +101,8 @@ $matchCtrl  = new MatchController(
     $matchService,
     $selectionRepo,
     $lineupRepo,
-    $eventRepo
+    $eventRepo,
+    $phaseRepo
 );
 $prepCtrl   = new MatchPreparationController(
     $authService,

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace BarePitch\Http\Controllers;
 
 use BarePitch\Core\Csrf;
-use BarePitch\Core\Database;
 use BarePitch\Core\Request;
 use BarePitch\Core\Response;
 use BarePitch\Core\View;
@@ -14,6 +13,7 @@ use BarePitch\Core\Exceptions\ValidationException;
 use BarePitch\Policies\PlayerPolicy;
 use BarePitch\Repositories\PlayerRepository;
 use BarePitch\Services\AuthService;
+use BarePitch\Services\PlayerService;
 use BarePitch\Services\TeamContextService;
 
 class PlayerController
@@ -22,6 +22,7 @@ class PlayerController
         private readonly AuthService        $auth,
         private readonly TeamContextService $teamContext,
         private readonly PlayerRepository   $players,
+        private readonly PlayerService      $playerService,
     ) {}
 
     public function index(Request $request, array $params = []): void
@@ -97,38 +98,18 @@ class PlayerController
             return;
         }
 
-        $pdo       = Database::connection();
-        $seasonId  = (int) ($team['current_season_id'] ?? 0);
+        $squadNumber   = $request->post('squad_number');
+        $preferredLine = trim((string) $request->post('preferred_line', ''));
+        $preferredFoot = trim((string) $request->post('preferred_foot', ''));
 
-        Database::beginTransaction();
-        try {
-            $playerId = $this->players->create([
-                'first_name'   => $firstName,
-                'last_name'    => $lastName,
-                'display_name' => $displayName !== '' ? $displayName : null,
-            ]);
-
-            if ($seasonId > 0) {
-                $squadNumber  = $request->post('squad_number');
-                $preferredLine = trim((string) $request->post('preferred_line', ''));
-                $preferredFoot = trim((string) $request->post('preferred_foot', ''));
-
-                $this->players->createSeasonContext([
-                    'player_id'          => $playerId,
-                    'season_id'          => $seasonId,
-                    'team_id'            => (int) $team['id'],
-                    'preferred_line'     => $preferredLine !== '' ? $preferredLine : null,
-                    'preferred_foot'     => $preferredFoot !== '' ? $preferredFoot : null,
-                    'squad_number'       => ($squadNumber !== null && $squadNumber !== '') ? (int) $squadNumber : null,
-                    'is_guest_eligible'  => 0,
-                ]);
-            }
-
-            Database::commit();
-        } catch (\Throwable $e) {
-            Database::rollback();
-            throw $e;
-        }
+        $playerId = $this->playerService->create($user, $team, [
+            'first_name'    => $firstName,
+            'last_name'     => $lastName,
+            'display_name'  => $displayName !== '' ? $displayName : null,
+            'squad_number'  => ($squadNumber !== null && $squadNumber !== '') ? (int) $squadNumber : null,
+            'preferred_line' => $preferredLine !== '' ? $preferredLine : null,
+            'preferred_foot' => $preferredFoot !== '' ? $preferredFoot : null,
+        ]);
 
         Response::redirect('/players/' . $playerId);
     }
