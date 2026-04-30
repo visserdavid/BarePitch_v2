@@ -69,6 +69,9 @@ class LockRepository
             'user_id'    => $userId,
             'expires_at' => $expiresAt,
         ]);
-        return ['id' => $id, 'match_id' => $matchId, 'user_id' => $userId, 'expires_at' => $expiresAt];
+        // Fetch the full row rather than constructing a partial array
+        $stmt = $this->pdo->prepare('SELECT * FROM match_lock WHERE id = ?');
+        $stmt->execute([$id]);
+        return $stmt->fetch();
     }
 }

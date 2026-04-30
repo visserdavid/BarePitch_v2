@@ -75,7 +75,10 @@ class EventRepository
         $stmt = $this->pdo->prepare(
             "SELECT * FROM match_event
              WHERE match_id = ?
-               AND event_type IN ('goal', 'penalty')
+               AND (
+                 event_type = 'goal'
+                 OR (event_type = 'penalty' AND outcome = 'scored')
+               )
              ORDER BY match_second ASC, id ASC"
         );
         $stmt->execute([$matchId]);

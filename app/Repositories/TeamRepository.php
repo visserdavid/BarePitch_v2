@@ -19,7 +19,9 @@ class TeamRepository
     public function findAccessibleForUser(int $userId, bool $isAdmin): array
     {
         if ($isAdmin) {
-            return $this->pdo->query('SELECT * FROM team WHERE is_active = 1 ORDER BY name')->fetchAll();
+            $stmt = $this->pdo->prepare('SELECT * FROM team WHERE is_active = 1 ORDER BY name');
+            $stmt->execute();
+            return $stmt->fetchAll();
         }
         $stmt = $this->pdo->prepare(
             'SELECT t.* FROM team t

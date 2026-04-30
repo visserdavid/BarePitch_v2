@@ -24,7 +24,9 @@ class UserRepository
 
     public function findActive(): array
     {
-        return $this->pdo->query('SELECT * FROM user WHERE is_active = 1 ORDER BY last_name, first_name')->fetchAll();
+        $stmt = $this->pdo->prepare('SELECT * FROM user WHERE is_active = 1 ORDER BY last_name, first_name');
+        $stmt->execute();
+        return $stmt->fetchAll();
     }
 
     /** Returns all user_team_role rows for this user */

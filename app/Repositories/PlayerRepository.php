@@ -57,8 +57,8 @@ class PlayerRepository
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO player_season_context
-             (player_id, season_id, team_id, preferred_line, preferred_foot, squad_number)
-             VALUES (?, ?, ?, ?, ?, ?)'
+             (player_id, season_id, team_id, preferred_line, preferred_foot, squad_number, is_guest_eligible)
+             VALUES (?, ?, ?, ?, ?, ?, ?)'
         );
         $stmt->execute([
             $data['player_id'],
@@ -67,6 +67,7 @@ class PlayerRepository
             $data['preferred_line'] ?? null,
             $data['preferred_foot'] ?? null,
             $data['squad_number'] ?? null,
+            $data['is_guest_eligible'] ?? 0,
         ]);
         return (int) $this->pdo->lastInsertId();
     }
@@ -81,7 +82,7 @@ class PlayerRepository
         $stmt = $this->pdo->prepare(
             "SELECT * FROM player WHERE id IN ($placeholders) AND is_active = 1"
         );
-        $stmt->execute(array_values($ids));
+        $stmt->execute(array_map('intval', array_values($ids)));
         return $stmt->fetchAll();
     }
 }
