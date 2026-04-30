@@ -1,0 +1,36 @@
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Dependencies and vendor output
+/vendor/
+
+# Runtime/generated files
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/cache/*
+!/storage/cache/.gitkeep
+/storage/sessions/*
+!/storage/sessions/.gitkeep
+
+# Backups and exports
+/backups/
+/exports/
+*.sql
+*.sqlite
+*.sqlite3
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test and coverage output
+/coverage/
+/.phpunit.cache/
+
