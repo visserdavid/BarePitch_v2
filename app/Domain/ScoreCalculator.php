@@ -23,16 +23,25 @@ final class ScoreCalculator
             $side    = $event['team_side'];
             $outcome = $event['outcome'] ?? EventOutcome::None->value;
 
-            $isGoal    = $type === EventType::Goal->value;
-            $isPenalty = $type === EventType::Penalty->value
-                && $outcome === EventOutcome::Scored->value;
+            $eventTypeEnum = EventType::tryFrom($type);
+            $isScoreType   = $eventTypeEnum?->isScoreEvent() ?? false;
 
-            if ($isGoal || $isPenalty) {
-                if ($side === TeamSide::Own->value) {
-                    $home++;
-                } else {
-                    $away++;
-                }
+            if (!$isScoreType) {
+                continue;
+            }
+
+            // Goal events are always scoring (a goal is definitionally successful;
+            // there is no such thing as a "missed goal" in the domain).
+            // Penalty events only score when outcome='scored' (vs. missed penalty).
+            $isPenalty = $eventTypeEnum === EventType::Penalty;
+            if ($isPenalty && $outcome !== EventOutcome::Scored->value) {
+                continue;
+            }
+
+            if ($side === TeamSide::Own->value) {
+                $home++;
+            } else {
+                $away++;
             }
         }
 
