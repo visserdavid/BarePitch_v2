@@ -156,6 +156,31 @@ class MatchPreparationService
         }
     }
 
+    /**
+     * Stores the selected formation on the match.
+     * Allowed for planned/prepared status.
+     */
+    public function setFormation(array $user, array $match, int $formationId): void
+    {
+        $this->requirePreparable($match);
+
+        Database::beginTransaction();
+        try {
+            $this->matches->update((int) $match['id'], ['formation_id' => $formationId]);
+            $this->audit->log(
+                userId:     (int) $user['id'],
+                entityType: 'match',
+                entityId:   (int) $match['id'],
+                actionKey:  'match.formation_set',
+                matchId:    (int) $match['id'],
+            );
+            Database::commit();
+        } catch (\Throwable $e) {
+            Database::rollback();
+            throw $e;
+        }
+    }
+
     private function requirePreparable(array $match): void
     {
         if (!in_array($match['status'], [

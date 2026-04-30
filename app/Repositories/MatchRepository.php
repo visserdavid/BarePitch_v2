@@ -86,7 +86,8 @@ class MatchRepository
     {
         // Note: 'status' is intentionally excluded — use updateStatus() for state transitions.
         $allowed = ['date', 'kick_off_time', 'opponent_name', 'home_away', 'match_type',
-                    'regular_half_duration_minutes', 'notes', 'active_phase', 'finished_at'];
+                    'regular_half_duration_minutes', 'notes', 'active_phase', 'finished_at',
+                    'formation_id'];
         $sets = [];
         $params = [];
         foreach ($allowed as $col) {

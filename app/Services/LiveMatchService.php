@@ -130,6 +130,60 @@ class LiveMatchService
     }
 
     /**
+     * Registers a goal for the opponent team and recalculates the score.
+     * player_selection_id is not applicable for opponent goals and is always null.
+     */
+    public function registerOpponentGoal(array $user, array $match, array $data): int
+    {
+        if ($match['status'] !== MatchStatus::Active->value) {
+            throw new DomainException('Goals can only be registered for an active match.');
+        }
+
+        // Get current period
+        $periods = $this->matches->findPeriods((int) $match['id']);
+        $activePeriod = null;
+        foreach (array_reverse($periods) as $p) {
+            if ($p['started_at'] !== null && $p['ended_at'] === null) {
+                $activePeriod = $p;
+                break;
+            }
+        }
+
+        Database::beginTransaction();
+        try {
+            $eventId = $this->events->create([
+                'match_id'             => $match['id'],
+                'period_id'            => $activePeriod ? $activePeriod['id'] : null,
+                'event_type'           => EventType::Goal->value,
+                'team_side'            => TeamSide::Opponent->value,
+                'player_selection_id'  => null,
+                'assist_selection_id'  => null,
+                'zone_code'            => $data['zone_code'] ?? null,
+                'outcome'              => EventOutcome::None->value,
+                'minute_display'       => $data['minute_display'] ?? null,
+                'match_second'         => $data['match_second'] ?? null,
+                'created_by_user_id'   => $user['id'],
+            ]);
+
+            $this->recalculateScore((int) $match['id']);
+
+            $this->audit->log(
+                userId:     (int) $user['id'],
+                entityType: 'match_event',
+                entityId:   $eventId,
+                actionKey:  'match.opponent_goal_registered',
+                matchId:    (int) $match['id'],
+            );
+
+            Database::commit();
+            return $eventId;
+        } catch (\Throwable $e) {
+            Database::rollback();
+            throw $e;
+        }
+    }
+
+    /**
      * Score recalculation. MUST be called inside the caller's transaction.
      * Fetches score events and runs ScoreCalculator — never blind-increments.
      */

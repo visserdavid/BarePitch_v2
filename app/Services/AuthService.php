@@ -39,11 +39,14 @@ class AuthService
     }
 
     /**
-     * Dev-only login. Guards against production use via ENABLE_DEV_LOGIN env var.
-     * Called only by AuthController after it has already verified the env flag.
+     * Dev-only login. The guard is enforced here so callers cannot bypass it.
      */
     public function loginAs(int $userId): void
     {
+        if (getenv('ENABLE_DEV_LOGIN') !== 'true') {
+            throw new \RuntimeException('Dev login is disabled');
+        }
+
         $user = $this->users->findById($userId);
         if (!$user || !(int) $user['is_active']) {
             throw new \InvalidArgumentException("User $userId not found or inactive.");
