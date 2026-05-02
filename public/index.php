@@ -140,6 +140,7 @@ Router::get('/matches',                                    fn(Request $req, arra
 Router::get('/matches/create',                             fn(Request $req, array $p) => $matchCtrl->create($req, $p));
 Router::post('/matches',                                   fn(Request $req, array $p) => $matchCtrl->store($req, $p));
 Router::get('/matches/{match_id}',                         fn(Request $req, array $p) => $matchCtrl->show($req, $p));
+Router::get('/matches/{match_id}/summary',                 fn(Request $req, array $p) => $matchCtrl->summary($req, $p));
 Router::get('/matches/{match_id}/edit',                    fn(Request $req, array $p) => $matchCtrl->edit($req, $p));
 Router::post('/matches/{match_id}/update',                 fn(Request $req, array $p) => $matchCtrl->update($req, $p));
 

@@ -36,7 +36,10 @@ desktop.ini
 # Test and coverage output
 /coverage/
 /.phpunit.cache/
+/.phpunit.result.cache
+
+# Local assistant/tool settings
+/.claude/
 
 # Git worktrees
 /.worktrees/
-

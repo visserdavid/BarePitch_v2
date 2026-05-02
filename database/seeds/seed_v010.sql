@@ -50,7 +50,7 @@ INSERT IGNORE INTO formation_position (id, formation_id, label, line_key, grid_r
   (10, 1, 'ST',  'FWD', 2, 6, 10),
   (11, 1, 'RW',  'FWD', 2, 9, 11);
 
--- 16 Players with season context
+-- 18 Players with season context
 -- Player 1: GK (squad #1)
 INSERT IGNORE INTO player (id, first_name, last_name, display_name, is_active) VALUES
   (1,  'Player',  '1',  'Player 1',  1),
@@ -68,7 +68,9 @@ INSERT IGNORE INTO player (id, first_name, last_name, display_name, is_active) V
   (13, 'Player', '13', 'Player 13',  1),
   (14, 'Player', '14', 'Player 14',  1),
   (15, 'Player', '15', 'Player 15',  1),
-  (16, 'Player', '16', 'Player 16',  1);
+  (16, 'Player', '16', 'Player 16',  1),
+  (17, 'Player', '17', 'Player 17',  1),
+  (18, 'Player', '18', 'Player 18',  1);
 
 -- Player season contexts: team_id=1, season_id=1
 -- Positions: 1xGK, 4xDEF, 5xMID, 6xFWD
@@ -88,6 +90,8 @@ INSERT IGNORE INTO player_season_context (id, player_id, season_id, team_id, pre
   (13, 13, 1, 1, 'FWD', 13),
   (14, 14, 1, 1, 'FWD', 14),
   (15, 15, 1, 1, 'FWD', 15),
-  (16, 16, 1, 1, 'FWD', 16);
+  (16, 16, 1, 1, 'FWD', 16),
+  (17, 17, 1, 1, 'DEF', 17),
+  (18, 18, 1, 1, 'MID', 18);
 
 SET FOREIGN_KEY_CHECKS = 1;

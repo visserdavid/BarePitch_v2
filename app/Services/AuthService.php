@@ -43,7 +43,7 @@ class AuthService
      */
     public function loginAs(int $userId): void
     {
-        if (getenv('ENABLE_DEV_LOGIN') !== 'true') {
+        if (!$this->devLoginEnabled()) {
             throw new \RuntimeException('Dev login is disabled');
         }
 
@@ -53,6 +53,11 @@ class AuthService
         }
         Session::regenerate();
         Session::set('user_id', $userId);
+    }
+
+    public function devLoginEnabled(): bool
+    {
+        return getenv('ENABLE_DEV_LOGIN') === 'true' && getenv('APP_ENV') === 'local';
     }
 
     public function logout(): void

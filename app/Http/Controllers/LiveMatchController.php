@@ -8,6 +8,7 @@ use BarePitch\Core\Csrf;
 use BarePitch\Core\Request;
 use BarePitch\Core\Response;
 use BarePitch\Core\View;
+use BarePitch\Core\Exceptions\DomainException;
 use BarePitch\Core\Exceptions\NotFoundException;
 use BarePitch\Core\Exceptions\ValidationException;
 use BarePitch\Http\Requests\RegisterGoalRequest;
@@ -69,6 +70,9 @@ class LiveMatchController
         } catch (ValidationException $e) {
             $this->renderLiveView($user, $team, $match, $e->getErrors());
             return;
+        } catch (DomainException $e) {
+            $this->renderLiveView($user, $team, $match, ['match' => $e->getMessage()]);
+            return;
         }
 
         Response::redirect('/matches/' . $match['id'] . '/live');
@@ -94,6 +98,9 @@ class LiveMatchController
         } catch (ValidationException $e) {
             $this->renderLiveView($user, $team, $match, $e->getErrors());
             return;
+        } catch (DomainException $e) {
+            $this->renderLiveView($user, $team, $match, ['match' => $e->getMessage()]);
+            return;
         }
 
         Response::redirect('/matches/' . $match['id']);
@@ -116,7 +123,7 @@ class LiveMatchController
 
         try {
             $this->liveService->endPeriod($user, $match, $periodId);
-        } catch (\BarePitch\Core\Exceptions\DomainException $e) {
+        } catch (DomainException $e) {
             $this->renderLiveView($user, $team, $match, ['period' => $e->getMessage()]);
             return;
         }
@@ -140,7 +147,7 @@ class LiveMatchController
 
         try {
             $this->liveService->startSecondHalf($user, $match);
-        } catch (\BarePitch\Core\Exceptions\DomainException $e) {
+        } catch (DomainException $e) {
             $this->renderLiveView($user, $team, $match, ['period' => $e->getMessage()]);
             return;
         }
@@ -167,6 +174,9 @@ class LiveMatchController
             $this->liveService->registerGoal($user, $match, $data);
         } catch (ValidationException $e) {
             $this->renderLiveView($user, $team, $match, $e->getErrors());
+            return;
+        } catch (DomainException $e) {
+            $this->renderLiveView($user, $team, $match, ['goal' => $e->getMessage()]);
             return;
         }
 

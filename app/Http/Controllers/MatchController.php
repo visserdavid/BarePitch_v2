@@ -8,6 +8,7 @@ use BarePitch\Core\Csrf;
 use BarePitch\Core\Request;
 use BarePitch\Core\Response;
 use BarePitch\Core\View;
+use BarePitch\Core\Exceptions\DomainException;
 use BarePitch\Core\Exceptions\NotFoundException;
 use BarePitch\Core\Exceptions\ValidationException;
 use BarePitch\Http\Requests\CreateMatchRequest;
@@ -135,6 +136,11 @@ class MatchController
         ]);
     }
 
+    public function summary(Request $request, array $params = []): void
+    {
+        $this->show($request, $params);
+    }
+
     public function edit(Request $request, array $params = []): void
     {
         $user  = $this->auth->requireAuth();
@@ -183,6 +189,17 @@ class MatchController
                 'team'   => $team,
                 'phases' => $phases,
                 'errors' => $e->getErrors(),
+                'old'    => $request->all(),
+                'user'   => $user,
+            ]);
+            return;
+        } catch (DomainException $e) {
+            $phases = $this->phases->findByTeam((int) $team['id']);
+            echo View::layout('matches/create', [
+                'match'  => $match,
+                'team'   => $team,
+                'phases' => $phases,
+                'errors' => ['match' => $e->getMessage()],
                 'old'    => $request->all(),
                 'user'   => $user,
             ]);

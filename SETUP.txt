@@ -1,0 +1,56 @@
+BarePitch v0.1.0 — Setup Instructions
+======================================
+
+1. Copy the example environment file and fill in your database credentials:
+
+       copy .env.example .env
+
+   Required values in .env:
+       DB_HOST=127.0.0.1
+       DB_PORT=3306
+       DB_NAME=barepitch
+       DB_USER=your_db_user
+       DB_PASSWORD=your_db_password
+       APP_ENV=local
+       ENABLE_DEV_LOGIN=true
+
+2. Install PHP dependencies (requires Composer):
+
+       composer install
+
+3. Create the database, then run migrations:
+
+       php scripts/migrate.php
+
+4. Seed demo data (1 club, team, admin user, 4-3-3 formation, 18 players):
+
+       php scripts/seed.php
+
+5. Start the development server:
+
+       php -S localhost:8000 -t public/
+
+6. Open http://localhost:8000/auth/dev-login in your browser.
+   Log in as Admin User and follow the match flow:
+
+   a. Create a match at /matches/create
+   b. Open the match and set attendance, formation, and lineup
+   c. Click "Confirm Preparation" — status becomes prepared
+   d. Start the match — status becomes active
+   e. Register own goals and opponent goals
+   f. Finish the match — summary shows final score and timeline
+
+7. Run the unit test suite:
+
+       vendor/bin/phpunit --testsuite Unit
+
+   Feature tests require a separate test database configured in .env.testing
+   (see .env.testing.example for the required values).
+
+Notes
+-----
+- ENABLE_DEV_LOGIN must be true and APP_ENV must be local for the dev login
+  screen to work. Never enable this outside a local development environment.
+- The vendor/ directory is not committed. Run "composer install" after
+  cloning or pulling to a new machine.
+- Migrations are tracked in the "migrations" table and are safe to re-run.

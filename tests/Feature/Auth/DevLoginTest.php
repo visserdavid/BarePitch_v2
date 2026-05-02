@@ -35,8 +35,21 @@ class DevLoginTest extends FeatureTestCase
      */
     public function testDevLoginServiceThrowsWhenDisabled(): void
     {
-        $this->addTearDownCallback(fn() => putenv('ENABLE_DEV_LOGIN=true'));
         putenv('ENABLE_DEV_LOGIN=false');
+        putenv('APP_ENV=local');
+
+        $pdo        = static::$db;
+        $userRepo   = new UserRepository($pdo);
+        $authService = new AuthService($userRepo);
+
+        $this->expectException(\RuntimeException::class);
+        $authService->loginAs(static::$coachId);
+    }
+
+    public function testDevLoginServiceThrowsWhenAppEnvIsNotLocal(): void
+    {
+        putenv('ENABLE_DEV_LOGIN=true');
+        putenv('APP_ENV=production');
 
         $pdo        = static::$db;
         $userRepo   = new UserRepository($pdo);
@@ -53,6 +66,7 @@ class DevLoginTest extends FeatureTestCase
     public function testLoginAsSucceedsWhenEnabled(): void
     {
         putenv('ENABLE_DEV_LOGIN=true');
+        putenv('APP_ENV=local');
 
         $pdo         = static::$db;
         $userRepo    = new UserRepository($pdo);
@@ -69,6 +83,7 @@ class DevLoginTest extends FeatureTestCase
     public function testLoginAsFailsForNonExistentUser(): void
     {
         putenv('ENABLE_DEV_LOGIN=true');
+        putenv('APP_ENV=local');
 
         $pdo         = static::$db;
         $userRepo    = new UserRepository($pdo);
@@ -85,6 +100,7 @@ class DevLoginTest extends FeatureTestCase
     public function testDevLoginPostWithoutCsrfTokenThrowsCsrfException(): void
     {
         putenv('ENABLE_DEV_LOGIN=true');
+        putenv('APP_ENV=local');
 
         $pdo         = static::$db;
         $userRepo    = new UserRepository($pdo);
@@ -105,6 +121,7 @@ class DevLoginTest extends FeatureTestCase
     {
         // Restore env var to test-default
         putenv('ENABLE_DEV_LOGIN=true');
+        putenv('APP_ENV=testing');
         $_POST    = [];
         $_SESSION = [];
         parent::tearDown();

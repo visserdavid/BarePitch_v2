@@ -55,6 +55,8 @@ class MatchStateTest extends FeatureTestCase
     public function testStartingPreparedMatchSucceeds(): void
     {
         $matchId = $this->createMatch(['status' => 'prepared']);
+        $playerId = $this->createPlayer('Starter', 'One');
+        $this->createSelection($matchId, $playerId, ['is_starting' => 1]);
         $match   = $this->fetchOne('SELECT * FROM `match` WHERE id = ?', [$matchId]);
         $user    = $this->loadUser(static::$coachId);
 

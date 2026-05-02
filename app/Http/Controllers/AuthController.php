@@ -21,7 +21,7 @@ class AuthController
 
     public function devLoginForm(Request $request, array $params = []): void
     {
-        if (getenv('ENABLE_DEV_LOGIN') !== 'true') {
+        if (!$this->auth->devLoginEnabled()) {
             Response::abort(404);
         }
 
@@ -35,7 +35,7 @@ class AuthController
 
     public function devLogin(Request $request, array $params = []): void
     {
-        if (getenv('ENABLE_DEV_LOGIN') !== 'true') {
+        if (!$this->auth->devLoginEnabled()) {
             Response::abort(404);
         }
 

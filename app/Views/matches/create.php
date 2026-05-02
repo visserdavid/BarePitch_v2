@@ -22,6 +22,12 @@ $val = static function (string $key) use ($old): string {
   </div>
 </div>
 
+<?php if (isset($errors['match'])): ?>
+  <div class="bp-flash__item bp-flash__item--error" role="alert" style="margin-bottom:var(--s-4);">
+    <?= htmlspecialchars((string)$errors['match'], ENT_QUOTES, 'UTF-8') ?>
+  </div>
+<?php endif; ?>
+
 <div class="bp-section">
   <form method="post" action="/matches" class="bp-stack" style="max-width:560px;">
     <?php include __DIR__ . '/../partials/csrf.php'; ?>

@@ -5,13 +5,22 @@ declare(strict_types=1);
 namespace BarePitch\Tests\Feature\Match;
 
 use BarePitch\Core\Exceptions\DomainException;
+use BarePitch\Core\Request;
+use BarePitch\Http\Controllers\MatchController;
 use BarePitch\Repositories\AuditRepository;
 use BarePitch\Repositories\EventRepository;
+use BarePitch\Repositories\LineupRepository;
 use BarePitch\Repositories\LockRepository;
 use BarePitch\Repositories\MatchRepository;
+use BarePitch\Repositories\PhaseRepository;
 use BarePitch\Repositories\SelectionRepository;
+use BarePitch\Repositories\UserRepository;
 use BarePitch\Services\AuditService;
+use BarePitch\Services\AuthService;
 use BarePitch\Services\LiveMatchService;
+use BarePitch\Services\MatchService;
+use BarePitch\Services\TeamContextService;
+use BarePitch\Repositories\TeamRepository;
 use BarePitch\Tests\Feature\FeatureTestCase;
 
 /**
@@ -81,6 +90,30 @@ class MatchFinishTest extends FeatureTestCase
         $this->assertSame('goal', $events[0]['event_type']);
     }
 
+    public function testSummaryRouteLoadsFinishedMatchSummaryView(): void
+    {
+        $matchId = $this->createMatch([
+            'status'       => 'finished',
+            'active_phase' => 'finished',
+            'goals_scored' => 3,
+            'goals_conceded' => 2,
+            'opponent_name' => 'Summary FC',
+        ]);
+
+        $_SESSION['user_id'] = static::$coachId;
+        $_SESSION['active_team_id'] = static::$teamId;
+
+        $controller = $this->buildMatchController();
+
+        ob_start();
+        $controller->summary(new Request(), ['match_id' => (string) $matchId]);
+        $html = (string) ob_get_clean();
+
+        $this->assertStringContainsString('Summary FC', $html);
+        $this->assertStringContainsString('3', $html);
+        $this->assertStringContainsString('2', $html);
+    }
+
     // ----------------------------------------------------------------
     // Re-starting a finished match is rejected at the service layer
     // ----------------------------------------------------------------
@@ -134,5 +167,23 @@ class MatchFinishTest extends FeatureTestCase
         $auditService  = new AuditService($auditRepo);
 
         return new LiveMatchService($matchRepo, $selectionRepo, $eventRepo, $lockRepo, $auditService);
+    }
+
+    private function buildMatchController(): MatchController
+    {
+        $pdo          = static::$db;
+        $auditRepo    = new AuditRepository($pdo);
+        $auditService = new AuditService($auditRepo);
+
+        return new MatchController(
+            new AuthService(new UserRepository($pdo)),
+            new TeamContextService(new TeamRepository($pdo)),
+            new MatchRepository($pdo),
+            new MatchService(new MatchRepository($pdo), $auditService),
+            new SelectionRepository($pdo),
+            new LineupRepository($pdo),
+            new EventRepository($pdo),
+            new PhaseRepository($pdo)
+        );
     }
 }

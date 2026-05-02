@@ -375,7 +375,6 @@ abstract class FeatureTestCase extends TestCase
     private static function injectDatabaseConnection(\PDO $pdo): void
     {
         $ref = new \ReflectionProperty(Database::class, 'connection');
-        $ref->setAccessible(true);
         $ref->setValue(null, $pdo);
     }
 }

@@ -8,6 +8,7 @@ use BarePitch\Core\Csrf;
 use BarePitch\Core\Request;
 use BarePitch\Core\Response;
 use BarePitch\Core\View;
+use BarePitch\Core\Exceptions\DomainException;
 use BarePitch\Core\Exceptions\NotFoundException;
 use BarePitch\Core\Exceptions\ValidationException;
 use BarePitch\Http\Requests\SaveAttendanceRequest;
@@ -71,6 +72,9 @@ class MatchPreparationController
         } catch (ValidationException $e) {
             $this->renderPrepView($user, $team, $match, $e->getErrors());
             return;
+        } catch (DomainException $e) {
+            $this->renderPrepView($user, $team, $match, ['attendance' => $e->getMessage()]);
+            return;
         }
 
         Response::redirect('/matches/' . $match['id'] . '/prepare');
@@ -95,6 +99,9 @@ class MatchPreparationController
             $this->prepService->setFormation($user, $match, $data['formation_id']);
         } catch (ValidationException $e) {
             $this->renderPrepView($user, $team, $match, $e->getErrors());
+            return;
+        } catch (DomainException $e) {
+            $this->renderPrepView($user, $team, $match, ['formation_id' => $e->getMessage()]);
             return;
         }
 
@@ -121,6 +128,9 @@ class MatchPreparationController
         } catch (ValidationException $e) {
             $this->renderPrepView($user, $team, $match, $e->getErrors());
             return;
+        } catch (DomainException $e) {
+            $this->renderPrepView($user, $team, $match, ['lineup' => $e->getMessage()]);
+            return;
         }
 
         Response::redirect('/matches/' . $match['id'] . '/prepare');
@@ -144,6 +154,9 @@ class MatchPreparationController
             $this->prepService->confirmPreparation($user, $match);
         } catch (ValidationException $e) {
             $this->renderPrepView($user, $team, $match, $e->getErrors());
+            return;
+        } catch (DomainException $e) {
+            $this->renderPrepView($user, $team, $match, ['preparation' => $e->getMessage()]);
             return;
         }
 
